@@ -1,1737 +1,1674 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Diligências e Viaturas</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    /* ============================================================
-       RESET E CONFIGURAÇÕES GLOBAIS
-       ============================================================ */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg-primary: #0a0e17;
-      --bg-secondary: #111927;
-      --bg-card: #141e2b;
-      --bg-card-hover: #1a2635;
-      --text-primary: #e8edf5;
-      --text-secondary: #8899aa;
-      --green-primary: #00d4a8;
-      --green-neon: #00ffc8;
-      --red-primary: #ff4757;
-      --yellow-warning: #ffc048;
-      --blue-info: #4a9eff;
-      --border-color: #1e2d3d;
-      --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-      --radius: 12px;
-      --transition: all 0.3s ease;
-    }
-
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 0;
-    }
-
-    .app-container {
-      max-width: 1440px;
-      width: 100%;
-      padding: 20px;
-      margin: 0 auto;
-    }
-
-    /* ============================================================
-       HEADER
-       ============================================================ */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 24px;
-      background: var(--bg-secondary);
-      border-radius: var(--radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo i {
-      font-size: 28px;
-      color: var(--green-primary);
-    }
-
-    .logo h1 {
-      font-size: 20px;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--green-primary), var(--green-neon));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .logo span {
-      font-size: 12px;
-      color: var(--text-secondary);
-      display: block;
-      -webkit-text-fill-color: var(--text-secondary);
-    }
-
-    .nav {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .nav button {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .nav button:hover {
-      background: var(--bg-card);
-      color: var(--text-primary);
-    }
-
-    .nav button.active {
-      background: var(--green-primary);
-      color: var(--bg-primary);
-      border-color: var(--green-primary);
-    }
-
-    .nav button i {
-      font-size: 14px;
-    }
-
-    /* ============================================================
-       DASHBOARD - CARDS ESTATÍSTICOS
-       ============================================================ */
-    .dashboard-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .stat-card {
-      background: var(--bg-secondary);
-      border-radius: var(--radius);
-      padding: 20px;
-      border: 1px solid var(--border-color);
-      transition: var(--transition);
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      border-color: var(--green-primary);
-    }
-
-    .stat-card .stat-number {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--green-primary);
-      line-height: 1.2;
-    }
-
-    .stat-card .stat-label {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
-
-    .stat-card .stat-icon {
-      float: right;
-      font-size: 28px;
-      opacity: 0.3;
-      color: var(--green-primary);
-    }
-
-    /* ============================================================
-       SEÇÃO VIATURAS
-       ============================================================ */
-    .section-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .section-title i {
-      color: var(--green-primary);
-    }
-
-    .veiculos-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .veiculo-card {
-      background: var(--bg-secondary);
-      border-radius: var(--radius);
-      padding: 20px;
-      border: 1px solid var(--border-color);
-      transition: var(--transition);
-      position: relative;
-    }
-
-    .veiculo-card:hover {
-      border-color: var(--green-primary);
-      transform: translateY(-2px);
-      background: var(--bg-card-hover);
-    }
-
-    .veiculo-card .status-indicator {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--green-primary);
-      box-shadow: 0 0 12px var(--green-neon);
-      transition: var(--transition);
-    }
-
-    .veiculo-card .status-indicator.vermelho {
-      background: var(--red-primary);
-      box-shadow: 0 0 12px var(--red-primary);
-    }
-
-    .veiculo-card .veiculo-id {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 2px;
-    }
-
-    .veiculo-card .veiculo-modelo {
-      font-size: 14px;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-
-    .veiculo-card .veiculo-info {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.8;
-    }
-
-    .veiculo-card .veiculo-info strong {
-      color: var(--text-primary);
-    }
-
-    .veiculo-card .btn-registrar {
-      width: 100%;
-      margin-top: 12px;
-      padding: 10px;
-      background: var(--green-primary);
-      color: var(--bg-primary);
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      font-size: 14px;
-    }
-
-    .veiculo-card .btn-registrar:hover {
-      background: var(--green-neon);
-      transform: scale(1.02);
-    }
-
-    /* ============================================================
-       CARD NOVA DILIGÊNCIA
-       ============================================================ */
-    .card-nova-diligencia {
-      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
-      border: 2px dashed var(--green-primary);
-      border-radius: var(--radius);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 200px;
-      cursor: pointer;
-      transition: var(--transition);
-      text-align: center;
-    }
-
-    .card-nova-diligencia:hover {
-      border-color: var(--green-neon);
-      background: var(--bg-card-hover);
-      transform: scale(1.02);
-    }
-
-    .card-nova-diligencia i {
-      font-size: 48px;
-      color: var(--green-primary);
-      margin-bottom: 12px;
-    }
-
-    .card-nova-diligencia h3 {
-      font-size: 18px;
-      color: var(--text-primary);
-    }
-
-    .card-nova-diligencia p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-top: 4px;
-    }
-
-    /* ============================================================
-       MODAL
-       ============================================================ */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(8px);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .modal-overlay.open {
-      display: flex;
-      animation: fadeIn 0.3s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    .modal {
-      background: var(--bg-secondary);
-      border-radius: var(--radius);
-      max-width: 700px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      padding: 0;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border-color);
-      position: sticky;
-      top: 0;
-      background: var(--bg-secondary);
-      border-radius: var(--radius) var(--radius) 0 0;
-      z-index: 1;
-    }
-
-    .modal-header h2 {
-      font-size: 18px;
-      color: var(--green-primary);
-    }
-
-    .modal-header .btn-close {
-      background: transparent;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 24px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-
-    .modal-header .btn-close:hover {
-      color: var(--red-primary);
-      transform: rotate(90deg);
-    }
-
-    .modal-body {
-      padding: 24px;
-    }
-
-    .modal-body .form-group {
-      margin-bottom: 16px;
-    }
-
-    .modal-body .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      margin-bottom: 4px;
-    }
-
-    .modal-body .form-group label .required {
-      color: var(--red-primary);
-      margin-left: 2px;
-    }
-
-    .modal-body .form-group input,
-    .modal-body .form-group select,
-    .modal-body .form-group textarea {
-      width: 100%;
-      padding: 10px 12px;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 14px;
-      transition: var(--transition);
-      font-family: inherit;
-    }
-
-    .modal-body .form-group input:focus,
-    .modal-body .form-group select:focus,
-    .modal-body .form-group textarea:focus {
-      outline: none;
-      border-color: var(--green-primary);
-      box-shadow: 0 0 0 3px rgba(0, 212, 168, 0.2);
-    }
-
-    .modal-body .form-group textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-
-    .modal-body .form-group select option {
-      background: var(--bg-primary);
-      color: var(--text-primary);
-    }
-
-    .modal-body .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .modal-body .form-row-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 16px;
-    }
-
-    .modal-footer {
-      display: flex;
-      gap: 12px;
-      justify-content: flex-end;
-      padding-top: 16px;
-      border-top: 1px solid var(--border-color);
-      margin-top: 8px;
-    }
-
-    .btn-cancel {
-      padding: 10px 24px;
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: var(--transition);
-    }
-
-    .btn-cancel:hover {
-      background: var(--bg-primary);
-      color: var(--text-primary);
-    }
-
-    .btn-submit {
-      padding: 10px 24px;
-      background: var(--green-primary);
-      border: none;
-      color: var(--bg-primary);
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: var(--transition);
-    }
-
-    .btn-submit:hover {
-      background: var(--green-neon);
-      transform: scale(1.02);
-    }
-
-    .btn-submit:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* ============================================================
-       ALERTA DE QUILOMETRAGEM
-       ============================================================ */
-    .alerta-km {
-      display: none;
-      background: rgba(255, 192, 72, 0.15);
-      border: 1px solid var(--yellow-warning);
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-
-    .alerta-km.active {
-      display: block;
-      animation: shake 0.5s ease;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-8px); }
-      40%, 80% { transform: translateX(8px); }
-    }
-
-    .alerta-km .alerta-titulo {
-      color: var(--yellow-warning);
-      font-weight: 600;
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
-
-    .alerta-km .alerta-detalhes {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.8;
-    }
-
-    .alerta-km .alerta-detalhes strong {
-      color: var(--text-primary);
-    }
-
-    .alerta-km .alerta-botoes {
-      display: flex;
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .alerta-km .btn-alerta-cancelar {
-      padding: 8px 20px;
-      background: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      transition: var(--transition);
-    }
-
-    .alerta-km .btn-alerta-cancelar:hover {
-      background: var(--bg-primary);
-      color: var(--text-primary);
-    }
-
-    .alerta-km .btn-alerta-inserir {
-      padding: 8px 20px;
-      background: var(--yellow-warning);
-      border: none;
-      color: var(--bg-primary);
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 13px;
-      transition: var(--transition);
-    }
-
-    .alerta-km .btn-alerta-inserir:hover {
-      background: #ffd866;
-      transform: scale(1.02);
-    }
-
-    /* ============================================================
-       SEÇÃO AUDITORIA
-       ============================================================ */
-    .auditoria-container {
-      display: none;
-      background: var(--bg-secondary);
-      border-radius: var(--radius);
-      border: 1px solid var(--border-color);
-      padding: 20px;
-      margin-top: 16px;
-    }
-
-    .auditoria-container.active {
-      display: block;
-    }
-
-    .auditoria-filtros {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .auditoria-filtros input,
-    .auditoria-filtros select {
-      padding: 8px 12px;
-      background: var(--bg-primary);
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      color: var(--text-primary);
-      font-size: 13px;
-      flex: 1;
-      min-width: 150px;
-    }
-
-    .auditoria-filtros input:focus,
-    .auditoria-filtros select:focus {
-      outline: none;
-      border-color: var(--green-primary);
-    }
-
-    .auditoria-tabela-wrapper {
-      overflow-x: auto;
-    }
-
-    .auditoria-tabela {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .auditoria-tabela th {
-      background: var(--bg-primary);
-      color: var(--text-secondary);
-      padding: 10px 12px;
-      text-align: left;
-      font-weight: 600;
-      border-bottom: 2px solid var(--border-color);
-      white-space: nowrap;
-    }
-
-    .auditoria-tabela td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--text-primary);
-    }
-
-    .auditoria-tabela tr:hover td {
-      background: var(--bg-card-hover);
-    }
-
-    .auditoria-tabela .diff-positive {
-      color: var(--green-primary);
-    }
-
-    .auditoria-tabela .diff-negative {
-      color: var(--red-primary);
-    }
-
-    .sem-dados {
-      text-align: center;
-      padding: 40px;
-      color: var(--text-secondary);
-    }
-
-    /* ============================================================
-       TOAST NOTIFICATIONS
-       ============================================================ */
-    .toast-container {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 2000;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .toast {
-      padding: 14px 20px;
-      border-radius: 8px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      font-size: 14px;
-      box-shadow: var(--shadow);
-      animation: slideIn 0.3s ease;
-      max-width: 400px;
-    }
-
-    .toast.success {
-      border-color: var(--green-primary);
-    }
-
-    .toast.error {
-      border-color: var(--red-primary);
-    }
-
-    .toast.warning {
-      border-color: var(--yellow-warning);
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(40px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-
-    /* ============================================================
-       RESPONSIVIDADE
-       ============================================================ */
-    @media (max-width: 768px) {
-      .app-container {
-        padding: 12px;
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 16px;
-      }
-
-      .logo h1 {
-        font-size: 16px;
-      }
-
-      .nav {
-        justify-content: center;
-      }
-
-      .nav button {
-        font-size: 12px;
-        padding: 6px 12px;
-      }
-
-      .nav button span {
-        display: none;
-      }
-
-      .dashboard-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-      }
-
-      .stat-card .stat-number {
-        font-size: 24px;
-      }
-
-      .veiculos-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modal {
-        margin: 10px;
-        max-height: 95vh;
-      }
-
-      .modal-body .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-
-      .modal-body .form-row-3 {
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
-
-      .modal-footer {
-        flex-direction: column;
-      }
-
-      .modal-footer button {
-        width: 100%;
-      }
-
-      .auditoria-filtros {
-        flex-direction: column;
-      }
-
-      .auditoria-filtros input,
-      .auditoria-filtros select {
-        min-width: auto;
-      }
-
-      .toast-container {
-        bottom: 12px;
-        right: 12px;
-        left: 12px;
-      }
-
-      .toast {
-        max-width: 100%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .dashboard-stats {
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-      }
-
-      .stat-card {
-        padding: 14px;
-      }
-
-      .stat-card .stat-number {
-        font-size: 20px;
-      }
-
-      .modal-body .form-row-3 {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--bg-primary);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--green-primary);
-    }
-
-    /* Loading */
-    .loading-spinner {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid var(--border-color);
-      border-top-color: var(--green-primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diligências e Controle de Viaturas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a237e, #0d47a1);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header .datetime {
+            font-size: 16px;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 18px;
+            border-radius: 20px;
+        }
+
+        /* Month Selector */
+        .month-selector {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            overflow-x: auto;
+        }
+
+        .month-selector label {
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .month-selector select {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            font-size: 14px;
+            min-width: 160px;
+            cursor: pointer;
+        }
+
+        .month-selector select:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .vehicle-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+            border-left: 5px solid #1a237e;
+        }
+
+        .vehicle-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+
+        .vehicle-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .vehicle-card .vehicle-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a237e;
+        }
+
+        .vehicle-card .count {
+            font-size: 42px;
+            font-weight: 700;
+            color: #0d47a1;
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .vehicle-card .count-label {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .vehicle-card .alert-indicator {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .vehicle-card .alert-indicator.active {
+            display: block;
+            animation: blink 1s infinite;
+        }
+
+        .vehicle-card .alert-indicator.warning {
+            background: #ff6f00;
+        }
+
+        .vehicle-card .alert-indicator.danger {
+            background: #d32f2f;
+        }
+
+        .vehicle-card .alert-indicator.success {
+            background: #2e7d32;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal .modal-header h2 {
+            color: #1a237e;
+            font-size: 22px;
+        }
+
+        .modal .modal-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .modal .modal-header .close-btn:hover {
+            color: #d32f2f;
+        }
+
+        /* Form */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 25px;
+        }
+
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .form-group input[readonly] {
+            background-color: #f5f5f5;
+            color: #666;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .btn-cancel {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-pending {
+            background: #ff6f00;
+            color: white;
+        }
+
+        .btn-pending:hover {
+            background: #e65100;
+        }
+
+        .btn-finish {
+            background: #1a237e;
+            color: white;
+        }
+
+        .btn-finish:hover {
+            background: #0d47a1;
+        }
+
+        .btn-primary {
+            background: #1a237e;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d47a1;
+        }
+
+        /* Diligências List */
+        .diligencia-list {
+            margin-top: 20px;
+        }
+
+        .diligencia-list table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .diligencia-list th {
+            background: #1a237e;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+        }
+
+        .diligencia-list td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .diligencia-list tr:hover td {
+            background: #f5f7ff;
+        }
+
+        .diligencia-list .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: #fff3e0;
+            color: #e65100;
+            animation: blink 1s infinite;
+        }
+
+        .status-badge.finished {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-badge.alert {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Search Filters */
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 8px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1a237e;
+            border-radius: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .modal {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filters input,
+            .filters select {
+                min-width: 100%;
+            }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 28px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            max-width: 400px;
+        }
+
+        .toast.success {
+            background: #2e7d32;
+        }
+
+        .toast.error {
+            background: #c62828;
+        }
+
+        .toast.warning {
+            background: #e65100;
+        }
+
+        .toast.info {
+            background: #0d47a1;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 4px solid #e0e0e0;
+            border-top-color: #1a237e;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
+    <div class="container" id="app">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚗 Diligências e Controle de Viaturas</h1>
+            <div class="datetime" id="currentDateTime">Carregando...</div>
+        </div>
 
-<div class="app-container" id="app">
-  <!-- HEADER -->
-  <header class="header">
-    <div class="logo">
-      <i class="fas fa-shield-alt"></i>
-      <div>
-        <h1>Controle de Diligências</h1>
-        <span>e uso de viaturas</span>
-      </div>
-    </div>
-    <nav class="nav" id="mainNav">
-      <button class="active" data-section="dashboard" onclick="showSection('dashboard')">
-        <i class="fas fa-home"></i> <span>Dashboard</span>
-      </button>
-      <button data-section="veiculos" onclick="showSection('veiculos')">
-        <i class="fas fa-car"></i> <span>Viaturas</span>
-      </button>
-      <button data-section="auditoria" onclick="showSection('auditoria')">
-        <i class="fas fa-history"></i> <span>Auditoria</span>
-      </button>
-      <button onclick="recarregarDados()">
-        <i class="fas fa-sync-alt"></i>
-      </button>
-    </nav>
-  </header>
+        <!-- Month Selector -->
+        <div class="month-selector">
+            <label for="monthSelect">📅 Mês:</label>
+            <select id="monthSelect" onchange="loadDashboard()"></select>
+        </div>
 
-  <!-- DASHBOARD -->
-  <section id="section-dashboard">
-    <div class="dashboard-stats" id="dashboardStats">
-      <div class="stat-card">
-        <div class="stat-number" id="statHoje">-</div>
-        <div class="stat-label">Diligências Hoje</div>
-        <i class="fas fa-calendar-day stat-icon"></i>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="statAndamento">-</div>
-        <div class="stat-label">Em Andamento</div>
-        <i class="fas fa-spinner stat-icon"></i>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="statFinalizadas">-</div>
-        <div class="stat-label">Finalizadas Hoje</div>
-        <i class="fas fa-check-circle stat-icon"></i>
-      </div>
-      <div class="stat-card">
-        <div class="stat-number" id="statTotal">-</div>
-        <div class="stat-label">Total Geral</div>
-        <i class="fas fa-database stat-icon"></i>
-      </div>
+        <!-- Cards -->
+        <div class="cards-grid" id="cardsContainer">
+            <div class="loading">Carregando dados...</div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="modal" id="modalContent">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Detalhes</h2>
+                    <button class="close-btn" onclick="closeModal()">&times;</button>
+                </div>
+                <div id="modalBody">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast -->
+        <div id="toastContainer"></div>
     </div>
 
-    <!-- VIATURAS -->
-    <div class="section-title">
-      <i class="fas fa-car"></i> Viaturas
-    </div>
-    <div class="veiculos-grid" id="veiculosGrid">
-      <!-- Cards gerados dinamicamente -->
-    </div>
-  </section>
+    <script>
+        // Global variables
+        const SHEET_ID = '1DJQqFSIwicfitFIe4eIyATBatyJEfinhBfxQ9M6upTY';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbz3KQOgWNKcV667cVOHJSoGxmKYoYmMkh2mM-RGhGgjmLBG1AHYK7gp43cqknkuRFDY4A/exec';
 
-  <!-- AUDITORIA -->
-  <section id="section-auditoria" style="display:none;">
-    <div class="auditoria-container active">
-      <div class="section-title">
-        <i class="fas fa-history"></i> Auditoria de Quilometragem
-      </div>
-      <div class="auditoria-filtros">
-        <input type="text" id="filtroViatura" placeholder="Filtrar por viatura..." oninput="carregarAuditoria()">
-        <input type="text" id="filtroData" placeholder="Filtrar por data..." oninput="carregarAuditoria()">
-        <input type="text" id="filtroUsuario" placeholder="Filtrar por usuário..." oninput="carregarAuditoria()">
-        <select id="filtroDivergencia" onchange="carregarAuditoria()">
-          <option value="">Todas divergências</option>
-          <option value="+">Positivas (+)</option>
-          <option value="-">Negativas (-)</option>
-        </select>
-      </div>
-      <div class="auditoria-tabela-wrapper">
-        <table class="auditoria-tabela">
-          <thead>
-            <tr>
-              <th>Data/Hora</th>
-              <th>Viatura</th>
-              <th>Usuário</th>
-              <th>KM Anterior</th>
-              <th>KM Informado</th>
-              <th>Diferença</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody id="auditoriaBody">
-            <tr><td colspan="7" class="sem-dados">Carregando...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-</div>
+        let currentVehicle = null;
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let allData = [];
+let vehicles = [];
+let drivers = [];
+let teams = [];
 
-<!-- MODAL DE DILIGÊNCIA -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 id="modalTitle"><i class="fas fa-plus-circle"></i> Nova Diligência</h2>
-      <button class="btn-close" onclick="fecharModal()">&times;</button>
-    </div>
-    <div class="modal-body" id="modalBody">
-      <form id="formDiligencia" onsubmit="return false;">
-        <!-- Linha 1: Data e Hora -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="fData">Data <span class="required">*</span></label>
-            <input type="date" id="fData" required>
-          </div>
-          <div class="form-group">
-            <label for="fHora">Hora Início <span class="required">*</span></label>
-            <input type="time" id="fHora" required>
-          </div>
-        </div>
-
-        <!-- Viatura -->
-        <div class="form-group">
-          <label for="fViatura">Viatura <span class="required">*</span></label>
-          <select id="fViatura" required onchange="carregarKmInicial()">
-            <option value="">Selecione uma viatura...</option>
-          </select>
-        </div>
-
-        <!-- KM Inicial e Final -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="fKmInicial">KM Inicial <span class="required">*</span></label>
-            <input type="number" id="fKmInicial" step="1" required placeholder="Carregando...">
-          </div>
-          <div class="form-group">
-            <label for="fKmFinal">KM Final <span class="required">*</span></label>
-            <input type="number" id="fKmFinal" step="1" required placeholder="Digite o KM final">
-          </div>
-        </div>
-
-        <!-- Condutor e Equipe -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="fCondutor">Condutor</label>
-            <input type="text" id="fCondutor" placeholder="Nome do condutor" list="listaCondutores">
-            <datalist id="listaCondutores"></datalist>
-          </div>
-          <div class="form-group">
-            <label for="fEquipe">Equipe</label>
-            <input type="text" id="fEquipe" placeholder="Nome da equipe" list="listaEquipes">
-            <datalist id="listaEquipes"></datalist>
-          </div>
-        </div>
-
-        <!-- Diligência e Motivo -->
-        <div class="form-row">
-          <div class="form-group">
-            <label for="fDiligencia">Diligência</label>
-            <input type="text" id="fDiligencia" placeholder="Tipo de diligência" list="listaDiligencias">
-            <datalist id="listaDiligencias"></datalist>
-          </div>
-          <div class="form-group">
-            <label for="fMotivo">Motivo</label>
-            <input type="text" id="fMotivo" placeholder="Motivo da diligência" list="listaMotivos">
-            <datalist id="listaMotivos"></datalist>
-          </div>
-        </div>
-
-        <!-- Status -->
-        <div class="form-group">
-          <label for="fStatus">Status</label>
-          <select id="fStatus">
-            <option value="Em Andamento">Em Andamento</option>
-            <option value="Finalizada" selected>Finalizada</option>
-            <option value="Cancelada">Cancelada</option>
-          </select>
-        </div>
-
-        <!-- Observação -->
-        <div class="form-group">
-          <label for="fObservacao">Observação</label>
-          <textarea id="fObservacao" placeholder="Observações adicionais"></textarea>
-        </div>
-
-        <!-- ALERTA DE KM -->
-        <div class="alerta-km" id="alertaKm">
-          <div class="alerta-titulo">⚠️ ATENÇÃO</div>
-          <div class="alerta-detalhes" id="alertaDetalhes">
-            A quilometragem informada é diferente do último KM registrado.
-          </div>
-          <div class="alerta-botoes">
-            <button class="btn-alerta-cancelar" onclick="cancelarAlertaKm()">Cancelar</button>
-            <button class="btn-alerta-inserir" onclick="confirmarAlertaKm()">Inserir mesmo assim</button>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn-cancel" onclick="fecharModal()">Cancelar</button>
-          <button type="button" class="btn-submit" id="btnFinalizar" onclick="finalizarDiligencia()">
-            <i class="fas fa-check"></i> Finalizar
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST CONTAINER -->
-<div class="toast-container" id="toastContainer"></div>
-
-<!-- ============================================================
-   JAVASCRIPT
-   ============================================================ -->
-<script>
-  // ============================================================
-  // CONFIGURAÇÃO
-  // ============================================================
-  const CONFIG = {
-    // ATENÇÃO: Substitua pela URL do seu Web App após o deploy
-    API_URL: 'https://script.google.com/macros/s/AKfycbz3KQOgWNKcV667cVOHJSoGxmKYoYmMkh2mM-RGhGgjmLBG1AHYK7gp43cqknkuRFDY4A/exec',
-  };
-
-  // ============================================================
-  // ESTADO GLOBAL
-  // ============================================================
-  let state = {
-    viaturaSelecionada: '',
-    kmAnterior: 0,
-    dadosPendentes: null,
-    alertaAtivo: false,
-    carregando: false,
-    listaViaturas: [],
-    listaCondutores: [],
-    listaEquipes: [],
-    listaDiligencias: [],
-    listaMotivos: []
-  };
-
-  // ============================================================
-  // FUNÇÕES DE API
-  // ============================================================
-  async function apiCall(action, params = {}) {
-    const url = new URL(CONFIG.API_URL);
-    url.searchParams.set('action', action);
-    
-    Object.keys(params).forEach(key => {
-      if (params[key] !== undefined && params[key] !== null && params[key] !== '') {
-        url.searchParams.set(key, params[key]);
-      }
-    });
-
-    try {
-      const response = await fetch(url.toString(), {
-        method: 'GET',
-        mode: 'cors',
-        cache: 'no-cache'
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const text = await response.text();
-      
-      try {
-        return JSON.parse(text);
-      } catch (e) {
-        const match = text.match(/^\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(([\s\S]*)\)\s*;?\s*$/);
-        if (match) {
-          try {
-            return JSON.parse(match[2]);
-          } catch (e2) {
-            throw new Error('Erro ao parsear resposta JSONP');
-          }
-        }
-        throw new Error('Resposta inválida do servidor');
-      }
-    } catch (error) {
-      console.error('Erro na API:', error);
-      showToast('Erro ao conectar com o servidor.', 'error');
-      throw error;
-    }
-  }
-
-  async function apiPost(action, data) {
-    try {
-      const response = await fetch(CONFIG.API_URL, {
-        method: 'POST',
-        mode: 'cors',
-        cache: 'no-cache',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ action, ...data })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const text = await response.text();
-      try {
-        return JSON.parse(text);
-      } catch (e) {
-        const match = text.match(/^\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(([\s\S]*)\)\s*;?\s*$/);
-        if (match) {
-          try {
-            return JSON.parse(match[2]);
-          } catch (e2) {
-            throw new Error('Erro ao parsear resposta JSONP');
-          }
-        }
-        throw new Error('Resposta inválida do servidor');
-      }
-    } catch (error) {
-      console.error('Erro na API POST:', error);
-      showToast('Erro ao enviar dados. Tente novamente.', 'error');
-      throw error;
-    }
-  }
-
-  // ============================================================
-  // CARREGAR DADOS DO DASHBOARD
-  // ============================================================
-  async function carregarDashboard() {
-    try {
-      const data = await apiCall('dashboard');
-      
-      document.getElementById('statHoje').textContent = data.diligenciasHoje || 0;
-      document.getElementById('statAndamento').textContent = data.emAndamento || 0;
-      document.getElementById('statFinalizadas').textContent = data.finalizadasHoje || 0;
-      document.getElementById('statTotal').textContent = data.totalGeral || 0;
-    } catch (error) {
-      console.error('Erro ao carregar dashboard:', error);
-      document.getElementById('statHoje').textContent = '?';
-      document.getElementById('statAndamento').textContent = '?';
-      document.getElementById('statFinalizadas').textContent = '?';
-      document.getElementById('statTotal').textContent = '?';
-    }
-  }
-
-  // ============================================================
-  // CARREGAR VIATURAS
-  // ============================================================
-  async function carregarViaturas() {
-    try {
-      const data = await apiCall('veiculos');
-      const grid = document.getElementById('veiculosGrid');
-      
-      // Adicionar card "Nova Diligência"
-      let html = `
-        <div class="card-nova-diligencia" onclick="abrirModalNova()">
-          <i class="fas fa-plus-circle"></i>
-          <h3>Nova Diligência</h3>
-          <p>Clique para registrar uma nova diligência</p>
-        </div>
-      `;
-      
-      if (!data.veiculos || data.veiculos.length === 0) {
-        grid.innerHTML = html + '<div class="sem-dados" style="grid-column:1/-1;">Nenhuma viatura encontrada.</div>';
-        return;
-      }
-
-      html += data.veiculos.map(v => `
-        <div class="veiculo-card" data-viatura="${v.id}">
-          <div class="status-indicator ${v.status === 'Em uso' ? 'vermelho' : ''}"></div>
-          <div class="veiculo-id">${v.id}</div>
-          <div class="veiculo-modelo">${v.modelo || 'Viatura'}</div>
-          <div class="veiculo-info">
-            <div><strong>ÚLTIMO USO</strong><br>${v.ultimoUso ? new Date(v.ultimoUso).toLocaleString('pt-BR') : 'Sem registro'}</div>
-            <div><strong>KM FINAL</strong><br>${v.kmFinal ? v.kmFinal.toLocaleString('pt-BR') + ' km' : 'Não registrado'}</div>
-          </div>
-          <button class="btn-registrar" onclick="abrirModalViatura('${v.id}')">
-            <i class="fas fa-pen"></i> Registrar Uso
-          </button>
-        </div>
-      `).join('');
-      
-      grid.innerHTML = html;
-    } catch (error) {
-      console.error('Erro ao carregar viaturas:', error);
-      document.getElementById('veiculosGrid').innerHTML = 
-        '<div class="sem-dados" style="grid-column:1/-1;">Erro ao carregar viaturas. Tente novamente.</div>';
-    }
-  }
-
-  // ============================================================
-  // CARREGAR LISTAS PARA O FORMULÁRIO
-  // ============================================================
-  async function carregarListas() {
-    try {
-      const data = await apiCall('listas');
-      
-      state.listaViaturas = data.viaturas || [];
-      state.listaCondutores = data.condutores || [];
-      state.listaEquipes = data.equipes || [];
-      state.listaDiligencias = data.diligencias || [];
-      state.listaMotivos = data.motivos || [];
-      
-      // Preencher select de viaturas
-      const select = document.getElementById('fViatura');
-      const currentVal = select.value;
-      select.innerHTML = '<option value="">Selecione uma viatura...</option>';
-      
-      state.listaViaturas.forEach(v => {
-        const option = document.createElement('option');
-        option.value = v;
-        option.textContent = v;
-        select.appendChild(option);
-      });
-      
-      if (currentVal && state.listaViaturas.includes(currentVal)) {
-        select.value = currentVal;
-      }
-      
-      // Preencher datalists
-      const datalists = {
-        listaCondutores: state.listaCondutores,
-        listaEquipes: state.listaEquipes,
-        listaDiligencias: state.listaDiligencias,
-        listaMotivos: state.listaMotivos
-      };
-      
-      Object.keys(datalists).forEach(id => {
-        const datalist = document.getElementById(id);
-        datalist.innerHTML = datalists[id].map(item => 
-          `<option value="${item}">`
-        ).join('');
-      });
-      
-    } catch (error) {
-      console.error('Erro ao carregar listas:', error);
-    }
-  }
-
-  // ============================================================
-  // CARREGAR KM INICIAL
-  // ============================================================
-  async function carregarKmInicial() {
-    const viatura = document.getElementById('fViatura').value;
-
-    if (!viatura) {
-      document.getElementById('fKmInicial').value = '';
-      document.getElementById('fKmInicial').placeholder = 'Selecione uma viatura';
-      state.kmAnterior = 0;
-      return;
-    }
-
-    try {
-      const data = await apiCall('ultimoKm', { viatura });
-
-      if (data.existe) {
-        // Último KM verdadeiro registrado para a viatura
-        state.kmAnterior = Number(data.kmFinal) || 0;
-
-        document.getElementById('fKmInicial').value = state.kmAnterior;
-        document.getElementById('fKmInicial').placeholder =
-          'Último KM registrado';
-      } else {
-        // Primeira diligência da viatura
-        state.kmAnterior = 0;
-
-        document.getElementById('fKmInicial').value = '';
-        document.getElementById('fKmInicial').placeholder =
-          'Sem registro anterior';
-      }
-
-    } catch (error) {
-      console.error('Erro ao carregar KM:', error);
-
-      state.kmAnterior = 0;
-
-      document.getElementById('fKmInicial').value = '';
-      document.getElementById('fKmInicial').placeholder =
-        'Erro ao carregar';
-    }
-}
-  // ============================================================
-  // CARREGAR AUDITORIA
-  // ============================================================
-  async function carregarAuditoria() {
-    try {
-      const filtroViatura = document.getElementById('filtroViatura').value;
-      const filtroData = document.getElementById('filtroData').value;
-      const filtroUsuario = document.getElementById('filtroUsuario').value;
-      const filtroDivergencia = document.getElementById('filtroDivergencia').value;
-
-      const params = {};
-      if (filtroViatura) params.viatura = filtroViatura;
-      if (filtroData) params.data = filtroData;
-      if (filtroUsuario) params.usuario = filtroUsuario;
-      if (filtroDivergencia) params.divergencia = filtroDivergencia;
-
-      const data = await apiCall('auditoria', params);
-      const tbody = document.getElementById('auditoriaBody');
-
-      if (!data.registros || data.registros.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="sem-dados">Nenhum registro de auditoria encontrado.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = data.registros.map(r => {
-        const diff = r.Diferença || '0';
-        const diffClass = diff.startsWith('+') ? 'diff-positive' : 
-                         diff.startsWith('-') ? 'diff-negative' : '';
-        return `
-          <tr>
-            <td>${r['Data/Hora'] || ''}</td>
-            <td>${r.Viatura || ''}</td>
-            <td>${r.Usuário || ''}</td>
-            <td>${r['KM Anterior'] || ''}</td>
-            <td>${r['KM Informado'] || ''}</td>
-            <td class="${diffClass}">${diff}</td>
-            <td>${r.Ação || ''}</td>
-          </tr>
-        `;
-      }).join('');
-    } catch (error) {
-      console.error('Erro ao carregar auditoria:', error);
-      document.getElementById('auditoriaBody').innerHTML = 
-        '<tr><td colspan="7" class="sem-dados">Erro ao carregar auditoria.</td></tr>';
-    }
-  }
-
-  // ============================================================
-  // ABRIR MODAL
-  // ============================================================
-  function abrirModalNova() {
-    state.viaturaSelecionada = '';
-    state.alertaAtivo = false;
-    state.dadosPendentes = null;
-    
-    document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Nova Diligência';
-    document.getElementById('fViatura').value = '';
-    preencherDataHora();
-    document.getElementById('fKmInicial').value = '';
-    document.getElementById('fKmInicial').placeholder = 'Selecione uma viatura';
-    limparCampos();
-    document.getElementById('alertaKm').classList.remove('active');
-    document.getElementById('modalOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function abrirModalViatura(viatura) {
-    state.viaturaSelecionada = viatura;
-    state.alertaAtivo = false;
-    state.dadosPendentes = null;
-    
-    document.getElementById('modalTitle').innerHTML = `<i class="fas fa-car"></i> Registrar Uso - ${viatura}`;
-    
-    // Selecionar a viatura no select
-    const select = document.getElementById('fViatura');
-    select.value = viatura;
-    
-    preencherDataHora();
-    carregarKmInicial();
-    limparCampos();
-    document.getElementById('alertaKm').classList.remove('active');
-    document.getElementById('modalOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function preencherDataHora() {
-    const agora = new Date();
-    document.getElementById('fData').value = agora.toISOString().split('T')[0];
-    document.getElementById('fHora').value = agora.toTimeString().slice(0, 5);
-  }
-
-  function limparCampos() {
-    document.getElementById('fKmFinal').value = '';
-    document.getElementById('fCondutor').value = '';
-    document.getElementById('fEquipe').value = '';
-    document.getElementById('fDiligencia').value = '';
-    document.getElementById('fMotivo').value = '';
-    document.getElementById('fObservacao').value = '';
-    document.getElementById('fStatus').value = 'Finalizada';
-  }
-
-  function fecharModal() {
-    document.getElementById('modalOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-    state.alertaAtivo = false;
-    state.dadosPendentes = null;
-    document.getElementById('alertaKm').classList.remove('active');
-    document.getElementById('btnFinalizar').disabled = false;
-    document.getElementById('btnFinalizar').style.opacity = '1';
-    document.getElementById('btnFinalizar').innerHTML = '<i class="fas fa-check"></i> Finalizar';
-  }
-
-  // ============================================================
-  // FINALIZAR DILIGÊNCIA
-  // ============================================================
-  async function finalizarDiligencia() {
-    if (state.carregando) return;
-    
-    // Coletar dados
-    const viatura = document.getElementById('fViatura').value;
-    const data = document.getElementById('fData').value;
-    const hora = document.getElementById('fHora').value;
-    const kmInicial = parseFloat(document.getElementById('fKmInicial').value);
-    const kmFinal = parseFloat(document.getElementById('fKmFinal').value);
-    const condutor = document.getElementById('fCondutor').value.trim();
-    const equipe = document.getElementById('fEquipe').value.trim();
-    const diligencia = document.getElementById('fDiligencia').value.trim();
-    const motivo = document.getElementById('fMotivo').value.trim();
-    const observacao = document.getElementById('fObservacao').value.trim();
-    const status = document.getElementById('fStatus').value;
-
-    // Validações
-    if (!viatura) {
-      showToast('Selecione uma viatura.', 'warning');
-      document.getElementById('fViatura').focus();
-      return;
-    }
-
-    if (!data) {
-      showToast('Informe a data.', 'warning');
-      document.getElementById('fData').focus();
-      return;
-    }
-
-    if (!hora) {
-      showToast('Informe a hora.', 'warning');
-      document.getElementById('fHora').focus();
-      return;
-    }
-
-    if (isNaN(kmInicial) || kmInicial < 0) {
-      showToast('KM inicial inválido. Certifique-se de selecionar uma viatura.', 'warning');
-      document.getElementById('fKmInicial').focus();
-      return;
-    }
-
-    if (isNaN(kmFinal) || kmFinal < 0) {
-      showToast('Informe o KM final válido.', 'warning');
-      document.getElementById('fKmFinal').focus();
-      return;
-    }
-
-    if (kmFinal < kmInicial) {
-      showToast('KM final não pode ser menor que o KM inicial.', 'warning');
-      document.getElementById('fKmFinal').focus();
-      return;
-    }
-
-    // ============================================================
-// VERIFICAR DIVERGÊNCIA DE KM
 // ============================================================
-// A divergência correta é:
-// ÚLTIMO KM REGISTRADO DA VIATURA
-//          X
-// KM INICIAL INFORMADO
-//
-// Não comparar KM Inicial x KM Final.
+// NORMALIZAÇÃO DOS DADOS RECEBIDOS DA API
 // ============================================================
 
-const kmAnterior = Number(state.kmAnterior) || 0;
+function normalizeClientKey(key) {
 
-// Se houver KM anterior registrado, verificar divergência.
-// Na primeira diligência, kmAnterior será 0 e não haverá alerta.
-const divergenciaValor = kmInicial - kmAnterior;
-const divergencia = kmAnterior > 0 && divergenciaValor !== 0;
-
-if (divergencia && !state.alertaAtivo) {
-
-  state.dadosPendentes = {
-    viatura,
-    data,
-    hora,
-    kmInicial,
-    kmFinal,
-    condutor,
-    equipe,
-    diligencia,
-    motivo,
-    observacao,
-    status
-  };
-
-  const detalhes = document.getElementById('alertaDetalhes');
-
-  detalhes.innerHTML = `
-    O KM inicial informado
-    <strong>${kmInicial.toLocaleString('pt-BR')} km</strong>
-    é diferente do último KM registrado para a viatura
-    <strong>${kmAnterior.toLocaleString('pt-BR')} km</strong>.
-    <br><br>
-    <strong>
-      Diferença:
-      ${divergenciaValor > 0 ? '+' : ''}
-      ${divergenciaValor.toLocaleString('pt-BR')} km
-    </strong>
-    <br><br>
-    Viatura: <strong>${viatura}</strong>
-  `;
-
-  document.getElementById('alertaKm').classList.add('active');
-
-  state.alertaAtivo = true;
-
-  document.getElementById('btnFinalizar').disabled = true;
-  document.getElementById('btnFinalizar').style.opacity = '0.5';
-
-  return;
+    return String(key || '')
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/\s+/g, '_');
 }
-    // Se o alerta foi confirmado ou não há divergência, prosseguir
-    await enviarDiligencia({
-      viatura, data, hora, kmInicial, kmFinal, condutor, equipe, 
-      diligencia, motivo, observacao, status,
-      usuario: 'Usuário Web'
+
+
+function normalizeDiligenciaData(item) {
+
+    const normalized = {};
+
+    Object.keys(item || {}).forEach(function(key) {
+
+        const normalizedKey = normalizeClientKey(key);
+
+        normalized[normalizedKey] = item[key];
+
     });
-  }
 
-  function cancelarAlertaKm() {
-    state.alertaAtivo = false;
-    state.dadosPendentes = null;
-    document.getElementById('alertaKm').classList.remove('active');
-    document.getElementById('btnFinalizar').disabled = false;
-    document.getElementById('btnFinalizar').style.opacity = '1';
-  }
+    return normalized;
+}
 
-  function confirmarAlertaKm() {
-    state.alertaAtivo = false;
-    document.getElementById('alertaKm').classList.remove('active');
-    document.getElementById('btnFinalizar').disabled = false;
-    document.getElementById('btnFinalizar').style.opacity = '1';
-    
-    if (state.dadosPendentes) {
-      enviarDiligencia({
-        ...state.dadosPendentes,
-        usuario: 'Usuário Web'
-      });
-      state.dadosPendentes = null;
+
+function normalizeAllData(data) {
+
+    return (data || []).map(function(item) {
+
+        return normalizeDiligenciaData(item);
+
+    });
+
+}
+// ============================================================
+// CONVERSÃO SEGURA DE DATAS
+// ============================================================
+
+function parseClientDate(value) {
+
+    if (!value) {
+        return null;
     }
-  }
 
-  // ============================================================
-  // ENVIAR DILIGÊNCIA PARA API
-  // ============================================================
-  async function enviarDiligencia(dados) {
-    if (state.carregando) return;
-    state.carregando = true;
-    const btn = document.getElementById('btnFinalizar');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
-
-    try {
-      const result = await apiPost('registrar', dados);
-      
-      if (result.error) {
-        showToast(`Erro: ${result.error}`, 'error');
-        return;
-      }
-
-      showToast(result.message || 'Diligência registrada com sucesso!', 'success');
-      
-      fecharModal();
-      await recarregarDados();
-      
-    } catch (error) {
-      console.error('Erro ao enviar:', error);
-      showToast('Erro ao registrar diligência. Tente novamente.', 'error');
-    } finally {
-      state.carregando = false;
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-check"></i> Finalizar';
+    // Já é uma data
+    if (value instanceof Date) {
+        return value;
     }
-  }
 
-  // ============================================================
-  // RECARREGAR TODOS OS DADOS
-  // ============================================================
-  async function recarregarDados() {
-    showToast('Atualizando dados...', 'info');
-    await Promise.all([
-      carregarDashboard(),
-      carregarViaturas(),
-      carregarListas()
-    ]);
-    showToast('Dados atualizados!', 'success');
-  }
+    const text = String(value).trim();
 
-  // ============================================================
-  // NAVEGAÇÃO ENTRE SEÇÕES
-  // ============================================================
-  function showSection(section) {
-  document.querySelectorAll('.nav button').forEach(btn => {
-    btn.classList.toggle(
-      'active',
-      btn.dataset.section === section
+    // Formato dd/MM/yyyy
+    const brMatch = text.match(
+        /^(\d{2})\/(\d{2})\/(\d{4})$/
     );
-  });
 
-  // Dashboard e Viaturas utilizam a mesma seção
-  document.getElementById('section-dashboard').style.display =
-    (section === 'dashboard' || section === 'veiculos')
-      ? 'block'
-      : 'none';
+    if (brMatch) {
 
-  // Auditoria possui seção própria
-  document.getElementById('section-auditoria').style.display =
-    section === 'auditoria'
-      ? 'block'
-      : 'none';
+        const day = Number(brMatch[1]);
+        const month = Number(brMatch[2]) - 1;
+        const year = Number(brMatch[3]);
 
-  // Se clicar em Viaturas, posiciona a tela
-  // diretamente na área de viaturas.
-  if (section === 'veiculos') {
-    const areaViaturas =
-      document.getElementById('veiculosGrid');
+        const date = new Date(
+            year,
+            month,
+            day
+        );
 
-    if (areaViaturas) {
-      setTimeout(() => {
-        areaViaturas.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }, 50);
-    }
-  }
-
-  // Carregar auditoria somente quando necessário
-  if (section === 'auditoria') {
-    carregarAuditoria();
-  }
-}
-  // ============================================================
-  // TOAST NOTIFICATIONS
-  // ============================================================
-  function showToast(message, type = 'info') {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    
-    const icons = {
-      success: '✅ ',
-      error: '❌ ',
-      warning: '⚠️ ',
-      info: 'ℹ️ '
-    };
-    toast.textContent = (icons[type] || '') + message;
-    
-    container.appendChild(toast);
-
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateX(40px)';
-      setTimeout(() => toast.remove(), 300);
-    }, 4000);
-  }
-
-  // ============================================================
-  // EVENTOS GLOBAIS
-  // ============================================================
-  document.getElementById('modalOverlay').addEventListener('click', function(e) {
-    if (e.target === this) {
-      fecharModal();
-    }
-  });
-
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      fecharModal();
-    }
-  });
-
-  // Enter para submeter o formulário
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('open')) {
-      const active = document.activeElement;
-      if (active && active.tagName !== 'BUTTON' && active.tagName !== 'TEXTAREA') {
-        e.preventDefault();
-        if (!state.alertaAtivo) {
-          finalizarDiligencia();
+        if (!isNaN(date.getTime())) {
+            return date;
         }
-      }
     }
-  });
 
-  // ============================================================
-  // INICIALIZAÇÃO
-  // ============================================================
-  async function init() {
-    showToast('Carregando sistema...', 'info');
-    await recarregarDados();
-    showToast('Sistema pronto para uso!', 'success');
-  }
+    // Formato yyyy-MM-dd
+    const isoDate = new Date(text);
 
-  document.addEventListener('DOMContentLoaded', init);
-</script>
+    if (!isNaN(isoDate.getTime())) {
+        return isoDate;
+    }
 
+    return null;
+}
+ function formatClientDate(value) {
+
+    if (!value) {
+        return '';
+    }
+
+    const date = parseClientDate(value);
+
+    if (!date) {
+        return '';
+    }
+
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
+function formatClientTime(value) {
+
+    if (!value) {
+        return '';
+    }
+
+    const text = String(value).trim();
+
+    // Caso venha como ISO Date:
+    // 1899-12-30T11:30:00.000Z
+    const isoMatch = text.match(
+        /T(\d{2}):(\d{2})/
+    );
+
+    if (isoMatch) {
+
+        const hours = Number(isoMatch[1]);
+        const minutes = Number(isoMatch[2]);
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+
+    // Caso já venha como HH:mm:ss
+    const timeMatch = text.match(
+        /^(\d{1,2}):(\d{2})(?::\d{2})?$/
+    );
+
+    if (timeMatch) {
+
+        const hours = Number(timeMatch[1]);
+        const minutes = Number(timeMatch[2]);
+
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+
+    return text;
+}
+       // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            populateMonthSelect();
+            loadDashboard();
+        });
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').textContent = now.toLocaleDateString('pt-BR', options);
+        }
+
+        function populateMonthSelect() {
+            const select = document.getElementById('monthSelect');
+            const months = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+
+            // Get current month and year
+            const now = new Date();
+            const currentMonthIndex = now.getMonth();
+            const currentYearNum = now.getFullYear();
+
+            // Add months from current month going back 12 months
+            for (let i = 0; i < 24; i++) {
+                let monthIndex = (currentMonthIndex - i) % 12;
+                let yearOffset = Math.floor((currentMonthIndex - i) / 12);
+                let year = currentYearNum + yearOffset;
+                if (monthIndex < 0) {
+                    monthIndex += 12;
+                    year -= 1;
+                }
+                const option = document.createElement('option');
+                option.value = `${year}-${String(monthIndex + 1).padStart(2, '0')}`;
+                option.textContent = `${months[monthIndex]} ${year}`;
+                select.appendChild(option);
+                if (i === 0) {
+                    option.selected = true;
+                    currentMonth = monthIndex;
+                    currentYear = year;
+                }
+            }
+        }
+
+        function loadDashboard() {
+            const select = document.getElementById('monthSelect');
+            const [year, month] = select.value.split('-').map(Number);
+            currentMonth = month - 1;
+            currentYear = year;
+
+            showLoading(true);
+            fetchData(month, year);
+        }
+
+        function fetchData(month, year) {
+            const url = `${API_URL}?action=getData&month=${month}&year=${year}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+
+    if (!data.success) {
+        throw new Error(data.error || 'Erro retornado pela API.');
+    }
+
+    // Normaliza os nomes das colunas recebidas da planilha
+    allData = normalizeAllData(data.diligences || []);
+
+    // Recebe os veículos diretamente da aba "veículos"
+    vehicles = data.vehicles || [];
+
+    // Recebe condutores e equipes
+    drivers = data.drivers || [];
+    teams = data.teams || [];
+
+    renderCards(month, year);
+
+    showLoading(false);
+})
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    showLoading(false);
+                    showToast('Erro ao carregar dados', 'error');
+                    // Use mock data for demo
+                    renderCards(month, year, true);
+                });
+        }
+
+        function renderCards(month, year, useMock = false) {
+            const container = document.getElementById('cardsContainer');
+            container.innerHTML = '';
+if (!vehicles || vehicles.length === 0) {
+
+    container.innerHTML = `
+        <div class="loading">
+            Nenhum veículo cadastrado na aba "veículos".
+        </div>
+    `;
+
+    return;
+}
+            let data = allData;
+
+            if (useMock) {
+                data = generateMockData();
+            }
+
+            // Filter by month/year
+            const filtered = data.filter(item => {
+
+    if (!item.data_inicio) {
+        return false;
+    }
+
+    const date = parseClientDate(item.data_inicio);
+
+    if (!date) {
+        return false;
+    }
+
+    return (
+        date.getMonth() === month - 1 &&
+        date.getFullYear() === year
+    );
+
+});
+
+            vehicles.forEach(vehicle => {
+                const count = filtered.filter(item => {
+
+    return item.veiculo &&
+        String(item.veiculo)
+            .trim()
+            .toUpperCase() ===
+        String(vehicle)
+            .trim()
+            .toUpperCase();
+
+}).length;
+
+                const card = document.createElement('div');
+                card.className = 'vehicle-card';
+                card.setAttribute('data-vehicle', vehicle);
+                card.innerHTML = `
+                    <div class="alert-indicator" id="alert-${vehicle.replace(/ /g, '_')}"></div>
+                    <div class="card-header">
+                        <span class="vehicle-name">${vehicle}</span>
+                    </div>
+                    <div class="count">${count}</div>
+                    <div class="count-label">Diligências no mês</div>
+                `;
+                card.addEventListener('click', () => openVehicleModal(vehicle));
+                container.appendChild(card);
+            });
+        }
+
+        function generateMockData() {
+            const mock = [];
+            const statuses = ['FINALIZADO', 'PENDENTE', 'FINALIZADO', 'FINALIZADO', 'PENDENTE'];
+            const diligencias = ['OM', 'BO', 'IP', 'INTIMAÇÃO', 'MANDADO DE PRISÃO', 'BUSCA E APREENSÃO'];
+
+            for (let i = 0; i < 20; i++) {
+                const date = new Date(2026, 7 + Math.floor(i / 5), 12 + i);
+                const vehicle = vehicles[i % 3];
+                mock.push({
+                    data_inicio: date.toLocaleDateString('pt-BR'),
+                    hora_inicio: `${String(7 + i % 5).padStart(2, '0')}:${String(30 * (i % 2)).padStart(2, '0')}`,
+                    ultimo_km: 1000 + i * 50,
+                    km_inicial: 1000 + i * 50,
+                    km_final: 1050 + i * 50,
+                    km_total: 50,
+                    veiculo: vehicle,
+                    condutor: `Condutor ${i + 1}`,
+                    equipe: `Equipe ${i + 1}`,
+                    diligencia: diligencias[i % diligencias.length],
+                    motivo: `Motivo ${i + 1}`,
+                    observacao: `Obs ${i + 1}`,
+                    data_final: date.toLocaleDateString('pt-BR'),
+                    hora_final: `${String(12 + i % 5).padStart(2, '0')}:${String(30 * (i % 2)).padStart(2, '0')}`,
+                    status_diligencia: statuses[i % statuses.length],
+                    linha: i + 2
+                });
+            }
+            return mock;
+        }
+
+        function openVehicleModal(vehicle) {
+            currentVehicle = vehicle;
+            document.getElementById('modalTitle').textContent = `🚗 ${vehicle}`;
+            document.getElementById('modalBody').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <select id="modalMonthSelect" onchange="updateDiligenciaList('${vehicle}')" style="padding:8px 16px;border-radius:8px;border:2px solid #e0e0e0;font-size:14px;width:100%;max-width:200px;">
+                        ${document.getElementById('monthSelect').innerHTML}
+                    </select>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+                    <button class="btn btn-primary" onclick="openNewDiligencia('${vehicle}')">➕ Nova Diligência</button>
+                    <button class="btn btn-primary" style="background:#1565c0;" onclick="openDiligenciaList('${vehicle}')">📋 Diligências</button>
+                </div>
+                <div id="diligenciaListContainer">
+                    <p style="color:#666;">Selecione um mês para visualizar as diligências.</p>
+                </div>
+            `;
+            document.getElementById('modalOverlay').classList.add('active');
+            updateDiligenciaList(vehicle);
+        }
+
+        function updateDiligenciaList(vehicle) {
+            const select = document.getElementById('modalMonthSelect');
+            const [year, month] = select.value.split('-').map(Number);
+            const container = document.getElementById('diligenciaListContainer');
+
+            const filtered = allData.filter(item => {
+
+    if (!item.data_inicio) {
+        return false;
+    }
+
+    if (
+        item.veiculo &&
+        String(item.veiculo).trim().toUpperCase() !==
+        String(vehicle).trim().toUpperCase()
+    ) {
+        return false;
+    }
+
+    const date = parseClientDate(item.data_inicio);
+
+    if (!date) {
+        return false;
+    }
+
+    return (
+        date.getMonth() === month - 1 &&
+        date.getFullYear() === year
+    );
+
+});
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada para este mês.</p>`;
+                return;
+            }
+
+            let html = `
+                <div style="overflow-x:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data Início</th>
+                                <th>Hora</th>
+                                <th>Km Inicial</th>
+                                <th>Km Final</th>
+                                <th>Condutor</th>
+                                <th>Diligência</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            filtered.forEach(item => {
+                const statusClass = item.status_diligencia === 'PENDENTE' ? 'pending' :
+                                   item.status_diligencia === 'FINALIZADO' ? 'finished' : 'alert';
+                html += `
+                    <tr onclick="editDiligencia(${item.linha || 0})" style="cursor:pointer;">
+                        <td>${formatClientDate(item.data_inicio)}</td>
+                        <td>${formatClientTime(item.hora_inicio)}</td>
+                        <td>${item.km_inicial || ''}</td>
+                        <td>${item.km_final || ''}</td>
+                        <td>${item.condutor || ''}</td>
+                        <td>${item.diligencia || ''}</td>
+                        <td><span class="status-badge ${statusClass}">${item.status_diligencia || ''}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table></div>`;
+            container.innerHTML = html;
+        }
+
+        function openDiligenciaList(vehicle) {
+            const container = document.getElementById('diligenciaListContainer');
+
+            // Get all data for this vehicle
+            const allVehicleData = allData.filter(item => {
+
+    return item.veiculo &&
+        String(item.veiculo).trim().toUpperCase() ===
+        String(vehicle).trim().toUpperCase();
+
+});
+            let html = `
+                <div class="filters">
+                    <input type="date" id="filterDate" onchange="applyFilters('${vehicle}')" placeholder="Data">
+                    <input type="text" id="filterConductor" onchange="applyFilters('${vehicle}')" placeholder="Condutor">
+                    <select id="filterDiligencia" onchange="applyFilters('${vehicle}')">
+                        <option value="">Todas as Diligências</option>
+                        <option value="BO">BO</option>
+                        <option value="OM">OM</option>
+                        <option value="IP">IP</option>
+                        <option value="APF">APF</option>
+                        <option value="INTIMAÇÃO">INTIMAÇÃO</option>
+                        <option value="MANDADO DE PRISÃO">MANDADO DE PRISÃO</option>
+                        <option value="BUSCA E APREENSÃO">BUSCA E APREENSÃO</option>
+                        <option value="ECD">ECD</option>
+                        <option value="LOCAL DE CRIME">LOCAL DE CRIME</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="applyFilters('${vehicle}')" style="padding:8px 20px;">🔍 Filtrar</button>
+                    <button class="btn" style="background:#e0e0e0;padding:8px 20px;" onclick="clearFilters('${vehicle}')">Limpar</button>
+                </div>
+                <div id="filteredList">
+            `;
+
+            if (allVehicleData.length === 0) {
+                html += `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada.</p>`;
+            } else {
+                html += buildTableHtml(allVehicleData);
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function applyFilters(vehicle) {
+            const dateFilter = document.getElementById('filterDate')?.value || '';
+            const conductorFilter = document.getElementById('filterConductor')?.value?.toUpperCase() || '';
+            const diligenciaFilter = document.getElementById('filterDiligencia')?.value || '';
+
+            let filtered = allData.filter(item =>
+    item.veiculo &&
+    String(item.veiculo).trim().toUpperCase() ===
+    String(vehicle).trim().toUpperCase()
+);
+
+            if (dateFilter) {
+
+    const filterDateObj = parseClientDate(dateFilter);
+
+    filtered = filtered.filter(item => {
+
+        if (!item.data_inicio) {
+            return false;
+        }
+
+        const itemDate = parseClientDate(item.data_inicio);
+
+        if (!itemDate || !filterDateObj) {
+            return false;
+        }
+
+        return (
+            itemDate.getFullYear() === filterDateObj.getFullYear() &&
+            itemDate.getMonth() === filterDateObj.getMonth() &&
+            itemDate.getDate() === filterDateObj.getDate()
+        );
+
+    });
+}
+            if (conductorFilter) {
+                filtered = filtered.filter(item =>
+                    item.condutor && item.condutor.toUpperCase().includes(conductorFilter)
+                );
+            }
+
+            if (diligenciaFilter) {
+                filtered = filtered.filter(item =>
+                    item.diligencia && item.diligencia.toUpperCase() === diligenciaFilter
+                );
+            }
+
+            const container = document.getElementById('filteredList');
+            if (filtered.length === 0) {
+                container.innerHTML = `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada com os filtros aplicados.</p>`;
+            } else {
+                container.innerHTML = buildTableHtml(filtered);
+            }
+        }
+
+        function clearFilters(vehicle) {
+            document.getElementById('filterDate').value = '';
+            document.getElementById('filterConductor').value = '';
+            document.getElementById('filterDiligencia').value = '';
+            applyFilters(vehicle);
+        }
+
+        function buildTableHtml(data) {
+            let html = `
+                <div style="overflow-x:auto;max-height:400px;overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data Início</th>
+                                <th>Hora</th>
+                                <th>Km Inicial</th>
+                                <th>Km Final</th>
+                                <th>Condutor</th>
+                                <th>Equipe</th>
+                                <th>Diligência</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.forEach(item => {
+                const statusClass = item.status_diligencia === 'PENDENTE' ? 'pending' :
+                                   item.status_diligencia === 'FINALIZADO' ? 'finished' : 'alert';
+                html += `
+                    <tr onclick="editDiligencia(${item.linha || 0})" style="cursor:pointer;">
+                        <td>${formatClientDate(item.data_inicio)}</td>
+                        <td>${formatClientTime(item.hora_inicio)}</td>
+                        <td>${item.km_inicial || ''}</td>
+                        <td>${item.km_final || ''}</td>
+                        <td>${item.condutor || ''}</td>
+                        <td>${item.equipe || ''}</td>
+                        <td>${item.diligencia || ''}</td>
+                        <td><span class="status-badge ${statusClass}">${item.status_diligencia || ''}</span></td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table></div>`;
+            return html;
+        }
+
+        function openNewDiligencia(vehicle) {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('pt-BR');
+            const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            // Find last km for this vehicle
+            let lastKm = 0;
+            const vehicleData = allData.filter(item =>
+    item.veiculo &&
+    String(item.veiculo).trim().toUpperCase() ===
+    String(vehicle).trim().toUpperCase()
+);
+            if (vehicleData.length > 0) {
+                // Sort by date and get the last one
+                const sorted = vehicleData.sort((a, b) => {
+
+    const dateA = parseClientDate(a.data_inicio);
+    const dateB = parseClientDate(b.data_inicio);
+
+    if (!dateA && !dateB) return 0;
+    if (!dateA) return 1;
+    if (!dateB) return -1;
+
+    return dateB - dateA;
+
+});
+                            for (const registro of sorted) {
+
+                const kmFinal = parseFloat(registro.km_final);
+
+                if (!isNaN(kmFinal) && kmFinal > 0) {
+
+                    lastKm = kmFinal;
+
+                    break;
+                }
+            }
+
+        }
+
+        document.getElementById('modalTitle').textContent = `📝 Nova Diligência - ${vehicle}`;
+            document.getElementById('modalBody').innerHTML = `
+                <form id="diligenciaForm" onsubmit="return false;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Data Início</label>
+                            <input type="text" id="f_data_inicio" value="${dateStr}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora Início</label>
+                            <input type="text" id="f_hora_inicio" value="${timeStr}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Último Km (não editável)</label>
+                            <input type="number" id="f_ultimo_km" value="${lastKm}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Km Inicial (editável)</label>
+                            <input type="number" id="f_km_inicial" value="${lastKm}" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Km Final</label>
+                            <input type="number" id="f_km_final" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Km Total (automático)</label>
+                            <input type="text" id="f_km_total" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Veículo</label>
+                            <input type="text" id="f_veiculo" value="${vehicle}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Condutor</label>
+                            <select id="f_condutor">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Equipe</label>
+                            <select id="f_equipe">
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Diligência</label>
+                            <select id="f_diligencia">
+                                <option value="">Selecione...</option>
+                                <option value="BO">BO</option>
+                                <option value="OM">OM</option>
+                                <option value="IP">IP</option>
+                                <option value="APF">APF</option>
+                                <option value="INTIMAÇÃO">INTIMAÇÃO</option>
+                                <option value="MANDADO DE PRISÃO">MANDADO DE PRISÃO</option>
+                                <option value="BUSCA E APREENSÃO">BUSCA E APREENSÃO</option>
+                                <option value="ECD">ECD</option>
+                                <option value="LOCAL DE CRIME">LOCAL DE CRIME</option>
+                            <option value="OUTRA">OUTRA</option>
+</select>
+                            <input type="text" id="f_diligencia_outra" placeholder="Outra diligência..." style="margin-top:5px;display:none;">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Motivo</label>
+                            <input type="text" id="f_motivo">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Observação</label>
+                            <textarea id="f_observacao"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Final</label>
+                            <input type="text" id="f_data_final" value="${dateStr}">
+                        </div>
+                        <div class="form-group">
+                            <label>Hora Final</label>
+                            <input type="text" id="f_hora_final" value="${timeStr}">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+                        <button type="button" class="btn btn-pending" onclick="saveDiligencia('PENDENTE')">📌 Pendente</button>
+                        <button type="button" class="btn btn-finish" onclick="saveDiligencia('FINALIZADO')">✅ Finalizar Diligência</button>
+                    </div>
+                </form>
+            `;
+
+            // Populate select options
+            drivers.forEach(driver => {
+                const opt = document.createElement('option');
+                opt.value = driver;
+                opt.textContent = driver;
+                document.getElementById('f_condutor').appendChild(opt);
+            });
+
+            teams.forEach(team => {
+                const opt = document.createElement('option');
+                opt.value = team;
+                opt.textContent = team;
+                document.getElementById('f_equipe').appendChild(opt);
+            });
+
+            // Show "outra" input when "outra" is selected or custom option
+            document.getElementById('f_diligencia').addEventListener('change', function() {
+                const outraInput = document.getElementById('f_diligencia_outra');
+                if (this.value === 'OUTRA') {
+
+    outraInput.style.display = 'block';
+    outraInput.focus();
+
+} else {
+
+    outraInput.style.display = 'none';
+    outraInput.value = '';
+
+}
+            });
+
+            // Auto calculate km total
+            document.getElementById('f_km_inicial').addEventListener('input', calculateKmTotal);
+            document.getElementById('f_km_final').addEventListener('input', calculateKmTotal);
+
+            // Check km difference
+            document.getElementById('f_km_inicial').addEventListener('blur', function() {
+                const ultimoKm = parseFloat(document.getElementById('f_ultimo_km').value) || 0;
+                const kmInicial = parseFloat(this.value) || 0;
+                if (kmInicial !== ultimoKm && kmInicial > 0) {
+                    if (confirm('⚠️ Km diferente do último registro. Deseja continuar?')) {
+                        // Continue - will be logged on save
+                    } else {
+                        this.value = ultimoKm;
+                    }
+                }
+            });
+
+            document.getElementById('f_km_final').addEventListener('blur', function() {
+                const kmInicial = parseFloat(document.getElementById('f_km_inicial').value) || 0;
+                const kmFinal = parseFloat(this.value) || 0;
+                if (kmFinal <= kmInicial && kmFinal > 0) {
+                    showToast('Km final deve ser maior que Km inicial!', 'error');
+                    this.value = '';
+                }
+            });
+
+            calculateKmTotal();
+        }
+
+        function calculateKmTotal() {
+            const kmInicial = parseFloat(document.getElementById('f_km_inicial').value) || 0;
+            const kmFinal = parseFloat(document.getElementById('f_km_final').value) || 0;
+            const total = kmFinal - kmInicial;
+            document.getElementById('f_km_total').value = total >= 0 ? total.toFixed(2) : '';
+        }
+
+        function saveDiligencia(status) {
+            const form = document.getElementById('diligenciaForm');
+            if (!form) return;
+
+            const data = {
+                data_inicio: document.getElementById('f_data_inicio').value,
+                hora_inicio: document.getElementById('f_hora_inicio').value,
+                ultimo_km: parseFloat(document.getElementById('f_ultimo_km').value) || 0,
+                km_inicial: parseFloat(document.getElementById('f_km_inicial').value) || 0,
+                km_final: parseFloat(document.getElementById('f_km_final').value) || 0,
+                km_total: parseFloat(document.getElementById('f_km_total').value) || 0,
+                veiculo: document.getElementById('f_veiculo').value,
+                condutor: document.getElementById('f_condutor').value,
+                equipe: document.getElementById('f_equipe').value,
+                diligencia:
+    document.getElementById('f_diligencia').value === 'OUTRA'
+        ? document.getElementById('f_diligencia_outra').value.trim()
+        : document.getElementById('f_diligencia').value,
+                motivo: document.getElementById('f_motivo').value,
+                observacao: document.getElementById('f_observacao').value,
+                data_final: document.getElementById('f_data_final').value,
+                hora_final: document.getElementById('f_hora_final').value,
+                status: status
+            };
+
+            // Validation for FINALIZADO
+            if (status === 'FINALIZADO') {
+                const required = ['data_inicio', 'hora_inicio', 'km_inicial', 'km_final', 'condutor', 'equipe', 'diligencia'];
+                let missing = required.filter(field => !data[field] || data[field] === '');
+                if (missing.length > 0) {
+                    showToast(`Preencha os campos: ${missing.join(', ')}`, 'error');
+                    return;
+                }
+
+                if (data.km_final <= data.km_inicial) {
+                    showToast('Km final deve ser maior que Km inicial!', 'error');
+                    return;
+                }
+
+                // Check if km_inicial differs from ultimo_km
+                if (data.km_inicial !== data.ultimo_km && data.km_inicial > 0) {
+                    // Will be logged in audit
+                    showToast('⚠️ Km diferente do último registro. Auditoria será registrada.', 'warning');
+                }
+            }
+
+            // Save to sheet via API
+            showLoading(true);
+            const url = `${API_URL}?action=saveDiligencia`;
+
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                showLoading(false);
+                showToast(`Diligência ${status === 'FINALIZADO' ? 'finalizada' : 'salva como pendente'} com sucesso!`, 'success');
+                closeModal();
+                loadDashboard();
+            })
+            .catch(error => {
+                showLoading(false);
+                showToast('Erro ao salvar diligência', 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function editDiligencia(linha) {
+            const item = allData.find(d => d.linha === linha);
+            if (!item) {
+                showToast('Registro não encontrado', 'error');
+                return;
+            }
+
+            document.getElementById('modalTitle').textContent = `✏️ Editar Diligência`;
+            document.getElementById('modalBody').innerHTML = `
+                <form id="editForm" onsubmit="return false;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Data Início</label>
+                            <input type="text" id="e_data_inicio" value="${formatClientDate(item.data_inicio)}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Hora Início</label>
+                            <input type="text" id="e_hora_inicio" value="${formatClientTime(item.hora_inicio)}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Km Inicial</label>
+                            <input type="number" id="e_km_inicial" value="${item.km_inicial || 0}" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Km Final</label>
+                            <input type="number" id="e_km_final" value="${item.km_final || 0}" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Condutor</label>
+                            <select id="e_condutor">
+                                ${drivers.map(d => `<option value="${d}" ${d === item.condutor ? 'selected' : ''}>${d}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Equipe</label>
+                            <select id="e_equipe">
+                                ${teams.map(t => `<option value="${t}" ${t === item.equipe ? 'selected' : ''}>${t}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Diligência</label>
+                            <select id="e_diligencia">
+    <option value="BO" ${item.diligencia === 'BO' ? 'selected' : ''}>BO</option>
+    <option value="OM" ${item.diligencia === 'OM' ? 'selected' : ''}>OM</option>
+    <option value="IP" ${item.diligencia === 'IP' ? 'selected' : ''}>IP</option>
+    <option value="APF" ${item.diligencia === 'APF' ? 'selected' : ''}>APF</option>
+    <option value="INTIMAÇÃO" ${item.diligencia === 'INTIMAÇÃO' ? 'selected' : ''}>INTIMAÇÃO</option>
+    <option value="MANDADO DE PRISÃO" ${item.diligencia === 'MANDADO DE PRISÃO' ? 'selected' : ''}>MANDADO DE PRISÃO</option>
+    <option value="BUSCA E APREENSÃO" ${item.diligencia === 'BUSCA E APREENSÃO' ? 'selected' : ''}>BUSCA E APREENSÃO</option>
+    <option value="ECD" ${item.diligencia === 'ECD' ? 'selected' : ''}>ECD</option>
+    <option value="LOCAL DE CRIME" ${item.diligencia === 'LOCAL DE CRIME' ? 'selected' : ''}>LOCAL DE CRIME</option>
+    <option value="OUTRA" ${![
+        'BO',
+        'OM',
+        'IP',
+        'APF',
+        'INTIMAÇÃO',
+        'MANDADO DE PRISÃO',
+        'BUSCA E APREENSÃO',
+        'ECD',
+        'LOCAL DE CRIME'
+    ].includes(item.diligencia) ? 'selected' : ''}>OUTRA</option>
+</select>
+
+<input
+    type="text"
+    id="e_diligencia_outra"
+    placeholder="Outra diligência..."
+    value="${![
+        'BO',
+        'OM',
+        'IP',
+        'APF',
+        'INTIMAÇÃO',
+        'MANDADO DE PRISÃO',
+        'BUSCA E APREENSÃO',
+        'ECD',
+        'LOCAL DE CRIME'
+    ].includes(item.diligencia) ? item.diligencia : ''}"
+    style="margin-top:5px;display:${
+        ![
+            'BO',
+            'OM',
+            'IP',
+            'APF',
+            'INTIMAÇÃO',
+            'MANDADO DE PRISÃO',
+            'BUSCA E APREENSÃO',
+            'ECD',
+            'LOCAL DE CRIME'
+        ].includes(item.diligencia) ? 'block' : 'none'
+    };">
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Motivo</label>
+                            <input type="text" id="e_motivo" value="${item.motivo || ''}">
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Observação</label>
+                            <textarea id="e_observacao">${item.observacao || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Final</label>
+<input type="text" id="e_data_final" value="${formatClientDate(item.data_final)}">
+                        </div>
+                        <div class="form-group">
+                            <label>Hora Final</label>
+                            <input type="text" id="e_hora_final" value="${formatClientTime(item.hora_final)}">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-cancel" onclick="closeModal()">Cancelar</button>
+                        ${item.status_diligencia === 'PENDENTE' ? 
+                            `<button type="button" class="btn btn-finish" onclick="updateDiligencia(${linha}, 'FINALIZADO')">✅ Finalizar Diligência</button>` :
+                            `<button type="button" class="btn btn-finish" onclick="updateDiligencia(${linha}, 'FINALIZADO')">💾 Atualizar</button>`
+                        }
+                    </div>
+                </form>
+            `;
+
+            // Enable km fields validation
+            document.getElementById('e_km_final').addEventListener('blur', function() {
+                const kmInicial = parseFloat(document.getElementById('e_km_inicial').value) || 0;
+                const kmFinal = parseFloat(this.value) || 0;
+                if (kmFinal <= kmInicial && kmFinal > 0) {
+                    showToast('Km final deve ser maior que Km inicial!', 'error');
+                    this.value = '';
+                }
+            });
+        document.getElementById('e_diligencia').addEventListener('change', function() {
+
+    const outraInput = document.getElementById('e_diligencia_outra');
+
+    if (this.value === 'OUTRA') {
+
+        outraInput.style.display = 'block';
+        outraInput.focus();
+
+    } else {
+
+        outraInput.style.display = 'none';
+        outraInput.value = '';
+
+    }
+
+});
+}
+
+        function updateDiligencia(linha, status) {
+            const item = allData.find(d => d.linha === linha);
+            if (!item) {
+                showToast('Registro não encontrado', 'error');
+                return;
+            }
+
+            const data = {
+                linha: linha,
+                data_inicio: document.getElementById('e_data_inicio').value,
+                hora_inicio: document.getElementById('e_hora_inicio').value,
+                km_inicial: parseFloat(document.getElementById('e_km_inicial').value) || 0,
+                km_final: parseFloat(document.getElementById('e_km_final').value) || 0,
+                condutor: document.getElementById('e_condutor').value,
+                equipe: document.getElementById('e_equipe').value,
+                diligencia:
+    document.getElementById('e_diligencia').value === 'OUTRA'
+        ? document.getElementById('e_diligencia_outra').value.trim()
+        : document.getElementById('e_diligencia').value,
+                motivo: document.getElementById('e_motivo').value,
+                observacao: document.getElementById('e_observacao').value,
+                data_final: document.getElementById('e_data_final').value,
+                hora_final: document.getElementById('e_hora_final').value,
+                status: status,
+                veiculo: item.veiculo,
+                ultimo_km: item.ultimo_km || 0
+            };
+
+            // Validation
+            if (status === 'FINALIZADO') {
+                const required = ['data_inicio', 'hora_inicio', 'km_inicial', 'km_final', 'condutor', 'equipe', 'diligencia'];
+                let missing = required.filter(field => !data[field] || data[field] === '');
+                if (missing.length > 0) {
+                    showToast(`Preencha os campos: ${missing.join(', ')}`, 'error');
+                    return;
+                }
+
+                if (data.km_final <= data.km_inicial) {
+                    showToast('Km final deve ser maior que Km inicial!', 'error');
+                    return;
+                }
+            }
+
+            showLoading(true);
+            const url = `${API_URL}?action=updateDiligencia`;
+
+            fetch(url, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                showLoading(false);
+                showToast('Diligência atualizada com sucesso!', 'success');
+                closeModal();
+                loadDashboard();
+            })
+            .catch(error => {
+                showLoading(false);
+                showToast('Erro ao atualizar diligência', 'error');
+                console.error('Error:', error);
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            const container = document.getElementById('cardsContainer');
+            if (show) {
+                container.innerHTML = '<div class="loading">Carregando dados...</div>';
+            }
+        }
+
+        // Click outside modal to close
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>
