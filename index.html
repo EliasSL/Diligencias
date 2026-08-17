@@ -134,32 +134,79 @@
         }
 
         .vehicle-card .alert-indicator {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: none;
-        }
+    position: absolute;
+    top: 12px;
+    right: 12px;
 
-        .vehicle-card .alert-indicator.active {
-            display: block;
-            animation: blink 1s infinite;
-        }
+    width: 32px;
+    height: 32px;
 
-        .vehicle-card .alert-indicator.warning {
-            background: #ff6f00;
-        }
+    border-radius: 50%;
 
-        .vehicle-card .alert-indicator.danger {
-            background: #d32f2f;
-        }
+    display: none;
 
-        .vehicle-card .alert-indicator.success {
-            background: #2e7d32;
-        }
+    align-items: center;
+    justify-content: center;
 
+    color: white;
+
+    font-size: 17px;
+    font-weight: 700;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.25);
+
+    z-index: 5;
+}
+
+.vehicle-card .alert-indicator.active {
+    display: flex;
+    animation: blink 1.2s infinite;
+}
+
+.vehicle-card .alert-indicator.warning {
+    background: #ff6f00;
+}
+
+.vehicle-card .alert-indicator.danger {
+    background: #d32f2f;
+}
+
+.vehicle-card .alert-indicator.success {
+    background: #2e7d32;
+}
+
+
+/* Texto de situação do card */
+
+.card-alert-text {
+    margin-top: 12px;
+
+    padding: 7px 10px;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+.card-alert-text.danger {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.card-alert-text.warning {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.card-alert-text.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
         @keyframes blink {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.2; }
@@ -167,67 +214,209 @@
 
         /* Modal */
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    display: none;
 
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: rgba(0,0,0,0.65);
+
+    z-index: 1000;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 0;
+}
         .modal-overlay.active {
             display: flex;
         }
 
         .modal {
-            background: white;
-            border-radius: 16px;
-            max-width: 800px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            padding: 30px;
-            position: relative;
-            animation: slideIn 0.3s ease;
-        }
+    background: white;
 
+    width: 100vw;
+    max-width: 100vw;
+
+    height: 100vh;
+    max-height: 100vh;
+
+    border-radius: 0;
+
+    overflow: hidden;
+
+    padding: 0;
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+
+    animation: slideIn 0.3s ease;
+}
+#modalBody {
+    flex: 1;
+
+    overflow-y: auto;
+
+    padding: 20px 25px;
+
+    background: #f5f7fa;
+
+    min-height: 0;
+}
+.btn-new-diligencia {
+    width: 100%;
+
+    min-height: 64px;
+
+    margin-bottom: 20px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #1a237e,
+        #0d47a1
+    );
+
+    color: white;
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 15px rgba(13,71,161,0.30);
+
+    transition: all 0.2s;
+}
+
+.btn-new-diligencia:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(13,71,161,0.40);
+}
+
+.btn-new-diligencia:active {
+    transform: scale(0.98);
+}
+.vehicle-summary {
+    display: grid;
+
+    grid-template-columns:
+        minmax(180px, 1fr)
+        minmax(180px, 1fr);
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.vehicle-summary-card {
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 18px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.08);
+
+    text-align: center;
+}
+
+.vehicle-summary-card .summary-number {
+    display: block;
+
+    font-size: 36px;
+
+    font-weight: 800;
+
+    color: #1a237e;
+}
+
+.vehicle-summary-card .summary-label {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #666;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
         @keyframes slideIn {
             from { transform: translateY(-30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
         .modal .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
+    flex-shrink: 0;
 
-        .modal .modal-header h2 {
-            color: #1a237e;
-            font-size: 22px;
-        }
+    display: flex;
 
-        .modal .modal-header .close-btn {
-            background: none;
-            border: none;
-            font-size: 28px;
-            cursor: pointer;
-            color: #999;
-            transition: color 0.2s;
-        }
+    justify-content: space-between;
+    align-items: center;
 
-        .modal .modal-header .close-btn:hover {
-            color: #d32f2f;
-        }
+    margin: 0;
 
+    padding: 18px 25px;
+
+    border-bottom: 2px solid #e8e8e8;
+
+    background: linear-gradient(
+        135deg,
+        #1a237e,
+        #0d47a1
+    );
+
+    color: white;
+}
+
+.modal .modal-header h2 {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.modal .modal-header .close-btn {
+    background: rgba(255,255,255,0.15);
+
+    border: none;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 50%;
+
+    font-size: 30px;
+
+    cursor: pointer;
+
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.2s;
+}
+
+.modal .modal-header .close-btn:hover {
+    background: #d32f2f;
+    color: white;
+}
         /* Form */
         .form-grid {
             display: grid;
@@ -578,6 +767,7 @@ let allData = [];
 let vehicles = [];
 let drivers = [];
 let teams = [];
+let vehicleAlerts = {};
 
 // ============================================================
 // NORMALIZAÇÃO DOS DADOS RECEBIDOS DA API
@@ -804,10 +994,13 @@ function formatClientTime(value) {
     vehicles = data.vehicles || [];
 
     // Recebe condutores e equipes
-    drivers = data.drivers || [];
-    teams = data.teams || [];
+drivers = data.drivers || [];
+teams = data.teams || [];
 
-    renderCards(month, year);
+// Recebe os alertas dos veículos
+vehicleAlerts = data.alerts || {};
+
+renderCards(month, year);
 
     showLoading(false);
 })
@@ -873,18 +1066,94 @@ if (!vehicles || vehicles.length === 0) {
 }).length;
 
                 const card = document.createElement('div');
-                card.className = 'vehicle-card';
-                card.setAttribute('data-vehicle', vehicle);
-                card.innerHTML = `
-                    <div class="alert-indicator" id="alert-${vehicle.replace(/ /g, '_')}"></div>
-                    <div class="card-header">
-                        <span class="vehicle-name">${vehicle}</span>
-                    </div>
-                    <div class="count">${count}</div>
-                    <div class="count-label">Diligências no mês</div>
-                `;
-                card.addEventListener('click', () => openVehicleModal(vehicle));
-                container.appendChild(card);
+
+card.className = 'vehicle-card';
+
+card.setAttribute(
+    'data-vehicle',
+    vehicle
+);
+
+const vehicleKey =
+    String(vehicle)
+        .trim()
+        .toUpperCase();
+
+const alert =
+    vehicleAlerts[vehicleKey] || {
+        km: false,
+        pendente: false
+    };
+
+
+// ==========================================================
+// DEFINIR ALERTA DO CARD
+// ==========================================================
+
+let alertClass = '';
+let alertIcon = '';
+
+if (alert.km) {
+
+    alertClass = 'danger';
+    alertIcon = '⚠️';
+
+} else if (alert.pendente) {
+
+    alertClass = 'warning';
+    alertIcon = '⏳';
+
+}
+
+
+// ==========================================================
+// HTML DO CARD
+// ==========================================================
+
+card.innerHTML = `
+
+    <div class="alert-indicator ${alertClass} ${alertClass ? 'active' : ''}">
+        ${alertIcon}
+    </div>
+
+    <div class="card-header">
+
+        <span class="vehicle-name">
+            🚗 ${vehicle}
+        </span>
+
+    </div>
+
+    <div class="count">
+        ${count}
+    </div>
+
+    <div class="count-label">
+        Diligências no mês
+    </div>
+
+    ${
+        alert.km
+            ? `<div class="card-alert-text danger">
+                    ⚠️ Divergência de KM
+               </div>`
+            : alert.pendente
+                ? `<div class="card-alert-text warning">
+                        ⏳ Diligência pendente
+                   </div>`
+                : `<div class="card-alert-text success">
+                        ✓ Situação normal
+                   </div>`
+    }
+
+`;
+
+card.addEventListener(
+    'click',
+    () => openVehicleModal(vehicle)
+);
+
+container.appendChild(card);
             });
         }
 
@@ -1026,8 +1295,17 @@ if (!vehicles || vehicles.length === 0) {
 });
             let html = `
                 <div class="filters">
-                    <input type="date" id="filterDate" onchange="applyFilters('${vehicle}')" placeholder="Data">
-                    <input type="text" id="filterConductor" onchange="applyFilters('${vehicle}')" placeholder="Condutor">
+                    <input
+    type="date"
+    id="filterDate"
+    onchange="applyVehicleFilters()"
+>
+                    <select
+    id="filterConductor"
+    onchange="applyVehicleFilters()"
+>
+    <option value="">Todos os condutores</option>
+</select>
                     <select id="filterDiligencia" onchange="applyFilters('${vehicle}')">
                         <option value="">Todas as Diligências</option>
                         <option value="BO">BO</option>
@@ -1040,8 +1318,20 @@ if (!vehicles || vehicles.length === 0) {
                         <option value="ECD">ECD</option>
                         <option value="LOCAL DE CRIME">LOCAL DE CRIME</option>
                     </select>
-                    <button class="btn btn-primary" onclick="applyFilters('${vehicle}')" style="padding:8px 20px;">🔍 Filtrar</button>
-                    <button class="btn" style="background:#e0e0e0;padding:8px 20px;" onclick="clearFilters('${vehicle}')">Limpar</button>
+                    <button
+    type="button"
+    class="btn btn-primary"
+    onclick="applyVehicleFilters()"
+>
+    🔍 Pesquisar
+</button>
+                    <button
+    type="button"
+    class="btn btn-cancel"
+    onclick="clearVehicleFilters()"
+>
+    Limpar
+</button>
                 </div>
                 <div id="filteredList">
             `;
