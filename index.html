@@ -22,7 +22,31 @@
             max-width: 1400px;
             margin: 0 auto;
         }
+/* Botão Voltar */
+.btn-back {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
 
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-back i {
+    font-size: 16px;
+}
         /* Header */
         .header {
             background: linear-gradient(135deg, #1a237e, #0d47a1);
@@ -535,27 +559,52 @@
 
         .diligencia-list table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
         }
 
         .diligencia-list th {
             background: #1a237e;
-            color: white;
-            padding: 10px 12px;
-            text-align: left;
-            position: sticky;
-            top: 0;
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    white-space: nowrap;
+
         }
 
         .diligencia-list td {
             padding: 8px 12px;
-            border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+
         }
 
         .diligencia-list tr:hover td {
-            background: #f5f7ff;
+            background: #f0f2ff !important;
+
         }
+.diligencia-list tr[style*="background:#ffebee"]:hover td {
+    background: #ffcdd2 !important;
+}
+
+.diligencia-list tr[style*="background:#fff3e0"]:hover td {
+    background: #ffe0b2 !important;
+}
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 15px;
+}
+.table-wrapper table {
+    min-width: 1200px;
+}
 
         .diligencia-list .status-badge {
             display: inline-block;
@@ -768,7 +817,24 @@ let vehicles = [];
 let drivers = [];
 let teams = [];
 let vehicleAlerts = {};
-
+// Controle de navegação entre telas
+function showView(view, vehicle) {
+    // view: 'main' (detalhes do veículo) ou 'list' (lista de diligências)
+    const container = document.getElementById('diligenciaListContainer');
+    const modalTitle = document.getElementById('modalTitle');
+    const mainView = document.getElementById('mainView');
+    const listView = document.getElementById('listView');
+    
+    if (view === 'main') {
+        if (mainView) mainView.style.display = 'block';
+        if (listView) listView.style.display = 'none';
+        modalTitle.textContent = `🚗 ${vehicle}`;
+    } else {
+        if (mainView) mainView.style.display = 'none';
+        if (listView) listView.style.display = 'block';
+        modalTitle.textContent = `📋 Diligências - ${vehicle}`;
+    }
+}
 // ============================================================
 // NORMALIZAÇÃO DOS DADOS RECEBIDOS DA API
 // ============================================================
@@ -1188,266 +1254,328 @@ container.appendChild(card);
         }
 
         function openVehicleModal(vehicle) {
-            currentVehicle = vehicle;
-            document.getElementById('modalTitle').textContent = `🚗 ${vehicle}`;
-            document.getElementById('modalBody').innerHTML = `
-                <div style="margin-bottom: 15px;">
-                    <select id="modalMonthSelect" onchange="updateDiligenciaList('${vehicle}')" style="padding:8px 16px;border-radius:8px;border:2px solid #e0e0e0;font-size:14px;width:100%;max-width:200px;">
-                        ${document.getElementById('monthSelect').innerHTML}
-                    </select>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
-                    <button class="btn btn-primary" onclick="openNewDiligencia('${vehicle}')">➕ Nova Diligência</button>
-                    <button class="btn btn-primary" style="background:#1565c0;" onclick="openDiligenciaList('${vehicle}')">📋 Diligências</button>
-                </div>
-                <div id="diligenciaListContainer">
-                    <p style="color:#666;">Selecione um mês para visualizar as diligências.</p>
-                </div>
-            `;
-            document.getElementById('modalOverlay').classList.add('active');
-            updateDiligenciaList(vehicle);
-        }
-
+    currentVehicle = vehicle;
+    document.getElementById('modalTitle').textContent = `🚗 ${vehicle}`;
+    document.getElementById('modalBody').innerHTML = `
+        <!-- VIEW PRINCIPAL (Detalhes do Veículo) -->
+        <div id="mainView">
+            <div style="margin-bottom: 15px;">
+                <select id="modalMonthSelect" onchange="updateDiligenciaList('${vehicle}')" style="padding:8px 16px;border-radius:8px;border:2px solid #e0e0e0;font-size:14px;width:100%;max-width:200px;">
+                    ${document.getElementById('monthSelect').innerHTML}
+                </select>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+                <button class="btn btn-primary" onclick="openNewDiligencia('${vehicle}')">➕ Nova Diligência</button>
+                <button class="btn btn-primary" style="background:#1565c0;" onclick="openDiligenciaList('${vehicle}')">📋 Diligências</button>
+            </div>
+            <div id="diligenciaPreviewContainer">
+                <p style="color:#666;">Selecione um mês para visualizar as diligências.</p>
+            </div>
+        </div>
+        
+        <!-- VIEW DA LISTA (Diligências) -->
+        <div id="listView" style="display:none;">
+            <div style="margin-bottom: 15px; display:flex; align-items:center; gap:15px; flex-wrap:wrap;">
+                <button class="btn btn-back" onclick="voltarParaMain('${vehicle}')">
+                    ← Voltar
+                </button>
+                <button class="btn btn-primary" onclick="openNewDiligencia('${vehicle}')" style="background:#0d47a1;">
+                    ➕ Nova Diligência
+                </button>
+            </div>
+            <div id="diligenciaListContainer">
+                <p style="color:#999;padding:20px;text-align:center;">Carregando diligências...</p>
+            </div>
+        </div>
+    `;
+    document.getElementById('modalOverlay').classList.add('active');
+    
+    // Carrega a visualização principal
+    document.getElementById('mainView').style.display = 'block';
+    document.getElementById('listView').style.display = 'none';
+    
+    // Atualiza a lista na visualização principal
+    updateDiligenciaList(vehicle);
+}
         function updateDiligenciaList(vehicle) {
-            const select = document.getElementById('modalMonthSelect');
-            const [year, month] = select.value.split('-').map(Number);
-            const container = document.getElementById('diligenciaListContainer');
+    const select = document.getElementById('modalMonthSelect');
+    if (!select) return;
+    
+    const [year, month] = select.value.split('-').map(Number);
+    const container = document.getElementById('diligenciaPreviewContainer');
+    if (!container) return;
 
-            const filtered = allData.filter(item => {
+    const filtered = allData.filter(item => {
+        if (!item.data_inicio) return false;
+        if (item.veiculo && String(item.veiculo).trim().toUpperCase() !== String(vehicle).trim().toUpperCase()) {
+            return false;
+        }
+        const date = parseClientDate(item.data_inicio);
+        if (!date) return false;
+        return (date.getMonth() === month - 1 && date.getFullYear() === year);
+    });
 
-    if (!item.data_inicio) {
-        return false;
+    if (filtered.length === 0) {
+        container.innerHTML = `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada para este mês.</p>`;
+        return;
     }
 
-    if (
-        item.veiculo &&
-        String(item.veiculo).trim().toUpperCase() !==
-        String(vehicle).trim().toUpperCase()
-    ) {
-        return false;
+    // Mostra apenas um resumo (ex: últimos 5 registros)
+    const previewData = filtered.slice(0, 5);
+    let html = `
+        <div style="margin-top: 10px;">
+            <p style="color:#666;font-size:13px;margin-bottom:10px;">📌 Últimas ${previewData.length} diligências (clique em "Diligências" para ver todas)</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">
+    `;
+
+    previewData.forEach(item => {
+        const statusClass = item.status_diligencia === 'PENDENTE' ? 'pending' : 'finished';
+        html += `
+            <div onclick="editDiligencia(${item.linha || 0})" style="cursor:pointer;background:#f8f9fa;border-radius:8px;padding:12px;border-left:4px solid ${item.status_diligencia === 'PENDENTE' ? '#e65100' : '#1a237e'};">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#666;">
+                    <span>${formatClientDate(item.data_inicio)}</span>
+                    <span>${formatClientTime(item.hora_inicio)}</span>
+                </div>
+                <div style="margin-top:4px;font-weight:600;">${item.diligencia || ''}</div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;">
+                    <span>👤 ${item.condutor || ''}</span>
+                    <span class="status-badge ${statusClass}">${item.status_diligencia || ''}</span>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div></div>`;
+    container.innerHTML = html;
+}
+        function openDiligenciaList(vehicle) {
+    // Muda para a view de lista
+    const mainView = document.getElementById('mainView');
+    const listView = document.getElementById('listView');
+    const modalTitle = document.getElementById('modalTitle');
+    
+    if (mainView) mainView.style.display = 'none';
+    if (listView) listView.style.display = 'block';
+    modalTitle.textContent = `📋 Diligências - ${vehicle}`;
+    
+    const container = document.getElementById('diligenciaListContainer');
+    if (!container) return;
+
+    // Get all data for this vehicle
+    const allVehicleData = allData.filter(item => {
+        return item.veiculo && String(item.veiculo).trim().toUpperCase() === String(vehicle).trim().toUpperCase();
+    });
+    
+    allVehicleData.sort((a, b) => {
+        const dataA = parseClientDate(a.data_inicio);
+        const dataB = parseClientDate(b.data_inicio);
+        if (!dataA && !dataB) return 0;
+        if (!dataA) return 1;
+        if (!dataB) return -1;
+        return dataB - dataA;
+    });
+
+    let html = `
+        <div class="filters">
+            <input type="date" id="filterDate" onchange="applyVehicleFilters()" style="padding:8px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:13px;flex:1;min-width:150px;">
+            <select id="filterConductor" onchange="applyVehicleFilters()" style="padding:8px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:13px;flex:1;min-width:150px;">
+                <option value="">Todos os condutores</option>
+                ${drivers.map(d => `<option value="${d}">${d}</option>`).join('')}
+            </select>
+            <select id="filterDiligencia" onchange="applyVehicleFilters()" style="padding:8px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:13px;flex:1;min-width:150px;">
+                <option value="">Todas as Diligências</option>
+                <option value="BO">BO</option>
+                <option value="OM">OM</option>
+                <option value="IP">IP</option>
+                <option value="APF">APF</option>
+                <option value="INTIMAÇÃO">INTIMAÇÃO</option>
+                <option value="MANDADO DE PRISÃO">MANDADO DE PRISÃO</option>
+                <option value="BUSCA E APREENSÃO">BUSCA E APREENSÃO</option>
+                <option value="ECD">ECD</option>
+                <option value="LOCAL DE CRIME">LOCAL DE CRIME</option>
+            </select>
+            <button type="button" class="btn btn-primary" onclick="applyVehicleFilters()" style="padding:8px 18px;">🔍 Pesquisar</button>
+            <button type="button" class="btn btn-cancel" onclick="clearVehicleFilters()" style="padding:8px 18px;">Limpar</button>
+        </div>
+        <div id="filteredList">
+    `;
+
+    if (allVehicleData.length === 0) {
+        html += `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada.</p>`;
+    } else {
+        html += buildTableHtml(allVehicleData);
     }
 
-    const date = parseClientDate(item.data_inicio);
+    html += `</div>`;
+    container.innerHTML = html;
+}
+function voltarParaMain(vehicle) {
+    // Volta para a visualização principal
+    const mainView = document.getElementById('mainView');
+    const listView = document.getElementById('listView');
+    const modalTitle = document.getElementById('modalTitle');
+    
+    if (mainView) mainView.style.display = 'block';
+    if (listView) listView.style.display = 'none';
+    modalTitle.textContent = `🚗 ${vehicle}`;
+    
+    // Atualiza a preview
+    updateDiligenciaList(vehicle);
+}
+        function applyVehicleFilters() {
+    // Obtém o veículo atual do título do modal
+    const title = document.getElementById('modalTitle').textContent;
+    const vehicleMatch = title.match(/Diligências - (.+)/);
+    const vehicle = vehicleMatch ? vehicleMatch[1] : currentVehicle;
+    
+    const dateFilter = document.getElementById('filterDate')?.value || '';
+    const conductorFilter = document.getElementById('filterConductor')?.value?.toUpperCase() || '';
+    const diligenciaFilter = document.getElementById('filterDiligencia')?.value || '';
 
-    if (!date) {
-        return false;
-    }
-
-    return (
-        date.getMonth() === month - 1 &&
-        date.getFullYear() === year
+    let filtered = allData.filter(item =>
+        item.veiculo && String(item.veiculo).trim().toUpperCase() === String(vehicle).trim().toUpperCase()
     );
 
-});
+    if (dateFilter) {
+        const filterDateObj = parseClientDate(dateFilter);
+        filtered = filtered.filter(item => {
+            if (!item.data_inicio) return false;
+            const itemDate = parseClientDate(item.data_inicio);
+            if (!itemDate || !filterDateObj) return false;
+            return (
+                itemDate.getFullYear() === filterDateObj.getFullYear() &&
+                itemDate.getMonth() === filterDateObj.getMonth() &&
+                itemDate.getDate() === filterDateObj.getDate()
+            );
+        });
+    }
 
-            if (filtered.length === 0) {
-                container.innerHTML = `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada para este mês.</p>`;
-                return;
-            }
-
-            let html = `
-                <div style="overflow-x:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data Início</th>
-                                <th>Hora</th>
-                                <th>Km Inicial</th>
-                                <th>Km Final</th>
-                                <th>Condutor</th>
-                                <th>Diligência</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            filtered.forEach(item => {
-                const statusClass = item.status_diligencia === 'PENDENTE' ? 'pending' :
-                                   item.status_diligencia === 'FINALIZADO' ? 'finished' : 'alert';
-                html += `
-                    <tr onclick="editDiligencia(${item.linha || 0})" style="cursor:pointer;">
-                        <td>${formatClientDate(item.data_inicio)}</td>
-                        <td>${formatClientTime(item.hora_inicio)}</td>
-                        <td>${item.km_inicial || ''}</td>
-                        <td>${item.km_final || ''}</td>
-                        <td>${item.condutor || ''}</td>
-                        <td>${item.diligencia || ''}</td>
-                        <td><span class="status-badge ${statusClass}">${item.status_diligencia || ''}</span></td>
-                    </tr>
-                `;
-            });
-
-            html += `</tbody></table></div>`;
-            container.innerHTML = html;
-        }
-
-        function openDiligenciaList(vehicle) {
-            const container = document.getElementById('diligenciaListContainer');
-
-            // Get all data for this vehicle
-            const allVehicleData = allData.filter(item => {
-
-    return item.veiculo &&
-        String(item.veiculo).trim().toUpperCase() ===
-        String(vehicle).trim().toUpperCase();
-
-});
-            let html = `
-                <div class="filters">
-                    <input
-    type="date"
-    id="filterDate"
-    onchange="applyVehicleFilters()"
->
-                    <select
-    id="filterConductor"
-    onchange="applyVehicleFilters()"
->
-    <option value="">Todos os condutores</option>
-</select>
-                    <select id="filterDiligencia" onchange="applyFilters('${vehicle}')">
-                        <option value="">Todas as Diligências</option>
-                        <option value="BO">BO</option>
-                        <option value="OM">OM</option>
-                        <option value="IP">IP</option>
-                        <option value="APF">APF</option>
-                        <option value="INTIMAÇÃO">INTIMAÇÃO</option>
-                        <option value="MANDADO DE PRISÃO">MANDADO DE PRISÃO</option>
-                        <option value="BUSCA E APREENSÃO">BUSCA E APREENSÃO</option>
-                        <option value="ECD">ECD</option>
-                        <option value="LOCAL DE CRIME">LOCAL DE CRIME</option>
-                    </select>
-                    <button
-    type="button"
-    class="btn btn-primary"
-    onclick="applyVehicleFilters()"
->
-    🔍 Pesquisar
-</button>
-                    <button
-    type="button"
-    class="btn btn-cancel"
-    onclick="clearVehicleFilters()"
->
-    Limpar
-</button>
-                </div>
-                <div id="filteredList">
-            `;
-
-            if (allVehicleData.length === 0) {
-                html += `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada.</p>`;
-            } else {
-                html += buildTableHtml(allVehicleData);
-            }
-
-            html += `</div>`;
-            container.innerHTML = html;
-        }
-
-        function applyFilters(vehicle) {
-            const dateFilter = document.getElementById('filterDate')?.value || '';
-            const conductorFilter = document.getElementById('filterConductor')?.value?.toUpperCase() || '';
-            const diligenciaFilter = document.getElementById('filterDiligencia')?.value || '';
-
-            let filtered = allData.filter(item =>
-    item.veiculo &&
-    String(item.veiculo).trim().toUpperCase() ===
-    String(vehicle).trim().toUpperCase()
-);
-
-            if (dateFilter) {
-
-    const filterDateObj = parseClientDate(dateFilter);
-
-    filtered = filtered.filter(item => {
-
-        if (!item.data_inicio) {
-            return false;
-        }
-
-        const itemDate = parseClientDate(item.data_inicio);
-
-        if (!itemDate || !filterDateObj) {
-            return false;
-        }
-
-        return (
-            itemDate.getFullYear() === filterDateObj.getFullYear() &&
-            itemDate.getMonth() === filterDateObj.getMonth() &&
-            itemDate.getDate() === filterDateObj.getDate()
+    if (conductorFilter) {
+        filtered = filtered.filter(item =>
+            item.condutor && item.condutor.toUpperCase().includes(conductorFilter)
         );
+    }
 
-    });
+    if (diligenciaFilter) {
+        filtered = filtered.filter(item =>
+            item.diligencia && item.diligencia.toUpperCase() === diligenciaFilter
+        );
+    }
+
+    const container = document.getElementById('filteredList');
+    if (!container) return;
+    
+    if (filtered.length === 0) {
+        container.innerHTML = `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada com os filtros aplicados.</p>`;
+    } else {
+        container.innerHTML = buildTableHtml(filtered);
+    }
 }
-            if (conductorFilter) {
-                filtered = filtered.filter(item =>
-                    item.condutor && item.condutor.toUpperCase().includes(conductorFilter)
-                );
-            }
-
-            if (diligenciaFilter) {
-                filtered = filtered.filter(item =>
-                    item.diligencia && item.diligencia.toUpperCase() === diligenciaFilter
-                );
-            }
-
-            const container = document.getElementById('filteredList');
-            if (filtered.length === 0) {
-                container.innerHTML = `<p style="color:#999;padding:20px;text-align:center;">Nenhuma diligência encontrada com os filtros aplicados.</p>`;
-            } else {
-                container.innerHTML = buildTableHtml(filtered);
-            }
-        }
-
-        function clearFilters(vehicle) {
-            document.getElementById('filterDate').value = '';
-            document.getElementById('filterConductor').value = '';
-            document.getElementById('filterDiligencia').value = '';
-            applyFilters(vehicle);
-        }
-
+        function clearVehicleFilters() {
+    document.getElementById('filterDate').value = '';
+    document.getElementById('filterConductor').value = '';
+    document.getElementById('filterDiligencia').value = '';
+    applyVehicleFilters();
+}
         function buildTableHtml(data) {
-            let html = `
-                <div style="overflow-x:auto;max-height:400px;overflow-y:auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data Início</th>
-                                <th>Hora</th>
-                                <th>Km Inicial</th>
-                                <th>Km Final</th>
-                                <th>Condutor</th>
-                                <th>Equipe</th>
-                                <th>Diligência</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
+    // Ordena por data decrescente
+    data.sort((a, b) => {
+        const dataA = parseClientDate(a.data_inicio);
+        const dataB = parseClientDate(b.data_inicio);
+        if (!dataA && !dataB) return 0;
+        if (!dataA) return 1;
+        if (!dataB) return -1;
+        return dataB - dataA;
+    });
 
-            data.forEach(item => {
-                const statusClass = item.status_diligencia === 'PENDENTE' ? 'pending' :
-                                   item.status_diligencia === 'FINALIZADO' ? 'finished' : 'alert';
-                html += `
-                    <tr onclick="editDiligencia(${item.linha || 0})" style="cursor:pointer;">
-                        <td>${formatClientDate(item.data_inicio)}</td>
-                        <td>${formatClientTime(item.hora_inicio)}</td>
-                        <td>${item.km_inicial || ''}</td>
-                        <td>${item.km_final || ''}</td>
-                        <td>${item.condutor || ''}</td>
-                        <td>${item.equipe || ''}</td>
-                        <td>${item.diligencia || ''}</td>
-                        <td><span class="status-badge ${statusClass}">${item.status_diligencia || ''}</span></td>
+    let html = `
+        <div style="overflow-x:auto; margin-top: 15px;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px; background:white; border-radius:12px; overflow:hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                <thead style="background: #1a237e; color: white; position: sticky; top: 0; z-index: 10;">
+                    <tr>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Data</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Hora Início</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Último Km</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Km Inicial</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Km Final</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Km Total</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Veículo</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Condutor</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Equipe</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Diligência</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Motivo</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Observação</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Data Final</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Hora Final</th>
+                        <th style="padding: 10px 10px; text-align:left; white-space:nowrap;">Status</th>
                     </tr>
-                `;
-            });
+                </thead>
+                <tbody>
+    `;
 
-            html += `</tbody></table></div>`;
-            return html;
+    data.forEach((item, index) => {
+        // Define cores de fundo baseadas no status ou divergência
+        let bgColor = '#ffffff';
+        let rowBorder = '';
+
+        // KM divergente
+        if (Number(item.ultimo_km || 0) > 0 && Number(item.km_inicial || 0) !== Number(item.ultimo_km || 0)) {
+            bgColor = '#ffebee';
+        } else if (String(item.status_diligencia || '').toUpperCase() === 'PENDENTE') {
+            bgColor = '#fff3e0';
         }
 
+        const statusClass = String(item.status_diligencia || '').toUpperCase() === 'PENDENTE' ? 'pending' : 'finished';
+
+        html += `
+            <tr onclick="editDiligencia(${item.linha || 0})" style="cursor:pointer; background:${bgColor}; ${index % 2 === 0 && bgColor === '#ffffff' ? 'background:#fafbfc;' : ''}">
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${formatClientDate(item.data_inicio)}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${formatClientTime(item.hora_inicio)}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.ultimo_km || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.km_inicial || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.km_final || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.km_total || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.veiculo || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.condutor || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.equipe || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.diligencia || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${item.motivo || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap; max-width:150px; overflow:hidden; text-overflow:ellipsis;">${item.observacao || ''}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${formatClientDate(item.data_final)}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">${formatClientTime(item.hora_final)}</td>
+                <td style="padding: 8px 10px; border-bottom:1px solid #eee; white-space:nowrap;">
+                    <span class="status-badge ${statusClass}">${item.status_diligencia || ''}</span>
+                </td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // Adiciona legenda de cores
+    html += `
+        <div style="display:flex; gap:20px; margin-top:15px; padding:10px 15px; background:#f8f9fa; border-radius:8px; flex-wrap:wrap;">
+            <span style="display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:16px; height:16px; background:#ffebee; border-radius:4px;"></span> Divergência de KM
+            </span>
+            <span style="display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:16px; height:16px; background:#fff3e0; border-radius:4px;"></span> Pendente
+            </span>
+            <span style="display:flex; align-items:center; gap:6px;">
+                <span style="display:inline-block; width:16px; height:16px; background:#e8f5e9; border-radius:4px;"></span> Finalizado
+            </span>
+            <span style="display:flex; align-items:center; gap:6px; color:#999; font-size:12px;">
+                💡 Clique em uma linha para editar
+            </span>
+        </div>
+    `;
+
+    return html;
+}
         function openNewDiligencia(vehicle) {
             const now = new Date();
             const dateStr = now.toLocaleDateString('pt-BR');
