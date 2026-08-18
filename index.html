@@ -14,9 +14,14 @@
         }
 
         body {
-            background-color: #f0f2f5;
-            padding: 20px;
-        }
+    background: 
+        radial-gradient(circle at 10% 20%, rgba(141, 110, 63, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 90% 80%, rgba(166, 124, 82, 0.3) 0%, transparent 50%),
+        linear-gradient(135deg, #7a5d35, #a67c52, #8d6e3f);
+    background-attachment: fixed;
+    padding: 20px;
+    min-height: 100vh;
+}
 
         .container {
             max-width: 1400px;
@@ -49,10 +54,11 @@
 }
         /* Header */
         .header {
-            background: linear-gradient(135deg, #1a237e, #0d47a1);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 12px;
+            
+background: linear-gradient(135deg, #1a237e, #0d47a1);
+    color: white;
+    padding: 20px 30px;
+    border-radius: 12px;
             margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
